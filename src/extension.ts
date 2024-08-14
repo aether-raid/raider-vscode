@@ -10,11 +10,11 @@ export function activate(context: vscode.ExtensionContext) {
         )
     );
 
-    const disposable = vscode.commands.registerCommand('extension.openChat', () => {
-        ChatPanel.createOrShow(context.extensionUri);
-    });
+    // const disposable = vscode.commands.registerCommand('extension.openChat', () => {
+    //     ChatPanel.createOrShow(context.extensionUri);
+    // });
 
-    context.subscriptions.push(disposable);
+    // context.subscriptions.push(disposable);
 }
 
 

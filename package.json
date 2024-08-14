@@ -15,7 +15,7 @@
 		"AI",
 		"Chat"
 	],
-	"activationEvents": ["onView:chatView"],
+	"activationEvents": [],
 	"contributes": {
 		"viewsContainers": {
 			"activitybar": [
@@ -28,12 +28,6 @@
 		},
 		"views": {
 			"chatSidebar": [
-				{
-					"id": "chatView",
-					"name": "Chat"
-				}
-			],
-			"explorer": [
 				{
 					"type": "webview",
 					"id": "chatView",
