@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
+declare const acquireVsCodeApi: any;
+
 const Chat: React.FC = () => {
     const [messages, setMessages] = useState<{ text: string, className: string }[]>([]);
     const [input, setInput] = useState('');
