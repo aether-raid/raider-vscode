@@ -82,7 +82,6 @@ export class ChatPanel {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview): string {
-        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
 
         return `<!DOCTYPE html>
         <html lang="en">
@@ -128,7 +127,42 @@ export class ChatPanel {
                 <textarea id="chat-input" rows="4" cols="50"></textarea>
                 <button id="send-button">Send</button>
             </div>
-            <script src="${scriptUri}"></script>
+            <script>
+                (function() {
+                    const vscode = acquireVsCodeApi();
+
+                    function addChatBubble(text, className) {
+                        const chatMessages = document.getElementById('chat-messages');
+                        const bubble = document.createElement('div');
+                        bubble.className = \`chat-bubble \${className}\`;
+                        bubble.textContent = text;
+                        chatMessages.appendChild(bubble);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+
+                    document.getElementById('send-button').addEventListener('click', () => {
+                        const input = document.getElementById('chat-input').value;
+                        if (input.trim()) {
+                            addChatBubble(input, 'user');
+                            vscode.postMessage({
+                                command: 'query',
+                                text: input
+                            });
+                            document.getElementById('chat-input').value = '';
+                        }
+                    });
+
+                    window.addEventListener('message', event => {
+                        const message = event.data;
+
+                        switch (message.command) {
+                            case 'response':
+                                addChatBubble(message.text, 'assistant');
+                                break;
+                        }
+                    });
+                })();
+            </script>
         </body>
         </html>`;
     }
