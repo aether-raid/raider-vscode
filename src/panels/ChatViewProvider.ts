@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { ChatPanel } from './ChatPanel';
 
 export class ChatViewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'chatView';
@@ -26,7 +25,8 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             message => {
                 switch (message.command) {
                     case 'query':
-                        ChatPanel.createOrShow(this._extensionUri);
+                        // Implement the logic to handle the 'query' command here
+                        console.log(`Received query: ${message.text}`);
                         return;
                 }
             },
