@@ -21,8 +21,8 @@
 			"activitybar": [
 				{
 					"id": "chatSidebar",
-					"title": "Chat",
-					"icon": "media/icon.png"
+					"title": "Raider",
+					"icon": "media/icon-5000px.png"
 				}
 			]
 		},
@@ -31,7 +31,7 @@
 				{
 					"type": "webview",
 					"id": "chatView",
-					"name": "Chat"
+					"name": "Raider"
 				}
 			]
 		}
