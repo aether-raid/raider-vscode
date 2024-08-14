@@ -25,8 +25,10 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
             message => {
                 switch (message.command) {
                     case 'query':
-                        // Implement the logic to handle the 'query' command here
-                        console.log(`Received query: ${message.text}`);
+                        webviewView.webview.postMessage({
+                            command: 'response',
+                            text: 'I am a friendly assistant'
+                        });
                         return;
                 }
             },
