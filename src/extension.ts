@@ -2,7 +2,14 @@ import * as vscode from 'vscode';
 import {ChatPanel} from "./panels/ChatPanel";
 
 export function activate(context: vscode.ExtensionContext) {
-    let disposable = vscode.commands.registerCommand('extension.openChat', () => {
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(
+            'chatView',
+            new ChatViewProvider(context.extensionUri)
+        )
+    );
+
+    const disposable = vscode.commands.registerCommand('extension.openChat', () => {
         ChatPanel.createOrShow(context.extensionUri);
     });
 

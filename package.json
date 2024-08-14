@@ -15,6 +15,25 @@
 		"AI",
 		"Chat"
 	],
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "chatSidebar",
+					"title": "Chat",
+					"icon": "media/icon.png"
+				}
+			]
+		},
+		"views": {
+			"chatSidebar": [
+				{
+					"id": "chatView",
+					"name": "Chat"
+				}
+			]
+		}
+	},
 	"main": "./out/extension.js",
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
