@@ -58,6 +58,27 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                     height: 100vh;
                     padding: 10px;
                 }
+                #chat-messages {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 10px;
+                }
+                .chat-bubble {
+                    max-width: 60%;
+                    padding: 10px;
+                    margin: 5px 0;
+                    border-radius: 10px;
+                }
+                .chat-bubble.user {
+                    background-color: #007acc;
+                    color: white;
+                    align-self: flex-end;
+                }
+                .chat-bubble.assistant {
+                    background-color: #333;
+                    color: white;
+                    align-self: flex-start;
+                }
                 #chat-input {
                     background-color: #333;
                     color: white;
@@ -81,7 +102,8 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         </head>
         <body>
             <div id="chat-container">
-                <textarea id="chat-input" rows="4" cols="50"></textarea>
+                <div id="chat-messages"></div>
+                <textarea id="chat-input" rows="2" cols="50"></textarea>
                 <button id="send-button">Send</button>
             </div>
             <script src="${scriptUri}"></script>
