@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const Chat: React.FC = () => {
@@ -6,7 +6,7 @@ const Chat: React.FC = () => {
     const [input, setInput] = useState('');
 
     const addChatBubble = (text: string, className: string) => {
-        setMessages([...messages, { text, className }]);
+        setMessages(prevMessages => [...prevMessages, { text, className }]);
     };
 
     const handleSend = () => {
@@ -20,12 +20,19 @@ const Chat: React.FC = () => {
         }
     };
 
-    window.addEventListener('message', event => {
-        const message = event.data;
-        if (message.command === 'response') {
-            addChatBubble(message.text, 'assistant');
-        }
-    });
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            const message = event.data;
+            if (message.command === 'response') {
+                addChatBubble(message.text, 'assistant');
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+        return () => {
+            window.removeEventListener('message', handleMessage);
+        };
+    }, []);
 
     return (
         <div id="chat-container">
