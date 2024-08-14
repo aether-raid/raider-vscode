@@ -43,7 +43,10 @@
 		"lint": "eslint \"src/**/*.ts\"",
 		"watch": "tsc -watch -p ./"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
 	"devDependencies": {
 		"@types/node": "^20.5.9",
 		"@types/vscode": "1.90.0",
