@@ -1,63 +1,121 @@
+import * as vscode from 'vscode';
 import React, { useState, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
+import styled from "@emotion/styled";
 
-declare const acquireVsCodeApi: any;
+type Message = {
+    role: string
+    content: string
+};
 
-const Chat: React.FC = () => {
-    const [messages, setMessages] = useState<{ text: string, className: string }[]>([]);
+type ChatBubbleProps = { 
+    role: string 
+};
+
+const roleColors = {
+    assistant: '#333',
+    user: '#007acc'
+};
+
+function getRoleColor(role: string) {
+    return Object.entries(roleColors).find(([key, val]) => key === role)?.[1];
+}
+
+const ChatBubbleContainer = styled.div<ChatBubbleProps>`
+    max-width: 60%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 10px;
+    color: white;
+    align-self: ${props => props.role == "user" ? 'flex-end': 'flex-start'};
+    background-color: ${props => getRoleColor(props.role)};
+`;
+
+type MessageBubbleProps = {
+    message: Message
+};
+
+const MessageBubble = (props: MessageBubbleProps) => {
+    return (
+        <ChatBubbleContainer role={props.message.role}>
+            {props.message.content}
+        </ChatBubbleContainer>
+    );
+};
+
+
+const ChatContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 10px;
+`;
+
+const MessagesContainer = styled.div`
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+`;
+
+const ChatInput = styled.textarea`
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+`;
+
+const SendButton = styled.button`
+    background-color: #007acc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #005a9e;
+    }
+`;
+
+
+
+
+export const Chat = () => {
+    const [messages, setMessages] = useState([] as Message[]);
     const [input, setInput] = useState('');
 
-    const addChatBubble = (text: string, className: string) => {
-        setMessages(prevMessages => [...prevMessages, { text, className }]);
+    const addChatBubble = (content: string, role: string) => {
+        setMessages(prevMessages => [...prevMessages, { content, role }]);
     };
 
     const handleSend = () => {
         if (input.trim()) {
             addChatBubble(input, 'user');
-            vscode.postMessage({
-                command: 'query',
-                text: input
-            });
             setInput('');
+
+            // llm processing thingy, rn not relevant
+            addChatBubble(
+                "I'm a helpful assistant, sorry",
+                'assistant'
+            );
         }
     };
 
-    useEffect(() => {
-        const handleMessage = (event: MessageEvent) => {
-            const message = event.data;
-            if (message.command === 'response') {
-                addChatBubble(message.text, 'assistant');
-            }
-        };
-
-        window.addEventListener('message', handleMessage);
-        return () => {
-            window.removeEventListener('message', handleMessage);
-        };
-    }, []);
-
     return (
-        <div id="chat-container">
-            <div id="chat-messages">
+        <ChatContainer>
+            <MessagesContainer>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`chat-bubble ${msg.className}`}>
-                        {msg.text}
-                    </div>
+                    <MessageBubble message={msg} key={index}/>
                 ))}
-            </div>
-            <textarea
-                id="chat-input"
+            </MessagesContainer>
+            <ChatInput
                 rows={2}
                 cols={50}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             />
-            <button id="send-button" onClick={handleSend}>Send</button>
-        </div>
+            <SendButton onClick={handleSend}>Send</SendButton>
+        </ChatContainer>
     );
 };
-
-const vscode = acquireVsCodeApi();
-const container = document.getElementById('root');
-const root = createRoot(container!);
-root.render(<Chat />);

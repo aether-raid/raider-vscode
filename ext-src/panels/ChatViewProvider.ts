@@ -51,52 +51,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                     background-color: #1e1e1e;
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
                 }
-                #chat-container {
-                    display: flex;
-                    flex-direction: column;
-                    height: 100vh;
-                    padding: 10px;
-                }
-                #chat-messages {
-                    flex: 1;
-                    overflow-y: auto;
-                    padding: 10px;
-                }
-                .chat-bubble {
-                    max-width: 60%;
-                    padding: 10px;
-                    margin: 5px 0;
-                    border-radius: 10px;
-                }
-                .chat-bubble.user {
-                    background-color: #007acc;
-                    color: white;
-                    align-self: flex-end;
-                }
-                .chat-bubble.assistant {
-                    background-color: #333;
-                    color: white;
-                    align-self: flex-start;
-                }
-                #chat-input {
-                    background-color: #333;
-                    color: white;
-                    border: 1px solid #555;
-                    border-radius: 4px;
-                    padding: 10px;
-                    margin-bottom: 10px;
-                }
-                #send-button {
-                    background-color: #007acc;
-                    color: white;
-                    border: none;
-                    border-radius: 4px;
-                    padding: 10px;
-                    cursor: pointer;
-                }
-                #send-button:hover {
-                    background-color: #005a9e;
-                }
+
             </style>
         </head>
         <body>

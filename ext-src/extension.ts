@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import {ChatViewProvider} from "./panels/ChatViewProvider";
+import { ReactProvider } from "./panel";
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
             'chatView',
-            new ChatViewProvider(context.extensionUri)
+            new ReactProvider(context.extensionUri)
         )
     );
 }
