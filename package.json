@@ -86,6 +86,8 @@
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
     "raider-chat": "file:",
     "vscode-react-webviews": "file:"
   }
