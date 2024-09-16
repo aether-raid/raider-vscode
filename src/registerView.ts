@@ -20,15 +20,27 @@ const template = (params: {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${params.title}</title>
     <meta http-equiv="Content-Security-Policy" content="${params.csp}" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
     />
+    <style>
+      .vscode-dark {
+        padding: 0px;
+      }
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+    </style>
   </head>
 
-  <body>
+  <body style="padding: 0;" >
     <div id="root"></div>
     <script type="module" nonce="${params.nonce}">
       import { render } from "${params.srcUri}";
@@ -101,7 +113,7 @@ const setViewHtml = <V extends ViewKey>(
   ).join(" ");
 
   webview.html = template({
-    title: "Example",
+    title: "RAiDer",
     csp,
     srcUri,
     publicPath,

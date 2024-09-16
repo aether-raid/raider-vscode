@@ -23,12 +23,19 @@ export type ViewApiEvent<K extends keyof ViewEvents = keyof ViewEvents> = {
   value: Parameters<ViewEvents[K]>;
 };
 
+export type Message = {
+  role: string;
+  content: string;
+};
+
 export type ViewApi = {
   getFileContents: () => Promise<string>;
   showExampleViewB: () => void;
   sendMessageToExampleB: (msg: string) => void;
-  sendMessageToClient: (msg: { role: string; content: string }) => void;
-  getMessagesFromClient: () => { role: string; content: string }[];
+  sendMessageToClient: (msg: Message) => void;
+  getMessagesFromClient: () => Message[];
+  resetMessageHistory: () => void;
+  getResetCommand: () => void;
 };
 
 export type ViewEvents = {

@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { ViewKey } from "./views";
 import { registerView } from "./registerView";
 import {
+  Message,
   ViewApi,
   ViewApiError,
   ViewApiEvent,
@@ -14,7 +15,7 @@ import fs from "node:fs/promises";
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
 
-  const messages = [] as { role: string; content: string }[];
+  const messages = [] as Message[];
 
   const triggerEvent = <E extends keyof ViewEvents>(
     key: E,
@@ -53,11 +54,17 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     sendMessageToExampleB: (msg: string) => {
       triggerEvent("exampleBMessage", msg);
     },
-    sendMessageToClient: (msg: { role: string; content: string }) => {
+    sendMessageToClient: (msg: Message) => {
       messages.push(msg);
     },
     getMessagesFromClient: () => {
       return messages;
+    },
+    resetMessageHistory: () => {
+      messages.length = 0;
+    },
+    getResetCommand: () => {
+      console.log("reset");
     },
   };
 
@@ -100,7 +107,12 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   };
 
   registerAndConnectView("raiderChat");
-  registerAndConnectView("raiderTerminal");
+  // registerAndConnectView("raiderTerminal");
+
+  vscode.commands.registerCommand("raider.reset", () => {
+    // messages.length = 0;
+    api.getResetCommand();
+  });
 };
 
 export const deactivate = () => {

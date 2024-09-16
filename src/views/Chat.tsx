@@ -1,86 +1,32 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { WebviewContext } from "./WebviewContext";
-import styled from "@emotion/styled";
-
-type Message = {
-  role: string;
-  content: string;
-};
-
-type ChatBubbleProps = {
-  role: string;
-};
-
-const roleColors = {
-  assistant: "#333",
-  user: "#007acc",
-};
-
-function getRoleColor(role: string) {
-  return Object.entries(roleColors).find(([key, val]) => key === role)?.[1];
-}
-
-const ChatBubbleContainer = styled.div<ChatBubbleProps>`
-  max-width: 100%;
-  padding: 10px;
-  color: white;
-  align-self: ${(props) => (props.role == "user" ? "flex-end" : "flex-start")};
-  background-color: ${(props) => getRoleColor(props.role)};
-`;
-
-type MessageBubbleProps = {
-  message: Message;
-};
-
-const MessageBubble = (props: MessageBubbleProps) => {
-  return (
-    <ChatBubbleContainer role={props.message.role}>
-      {props.message.content}
-    </ChatBubbleContainer>
-  );
-};
-
-const ChatContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding: 10px;
-`;
-
-const MessagesContainer = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-`;
-
-const ChatInput = styled.textarea`
-  background-color: #333;
-  color: white;
-  border: 1px solid #555;
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 10px;
-`;
-
-const SendButton = styled.button`
-  background-color: #007acc;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #005a9e;
-  }
-`;
+import {
+  ChatContainer,
+  ChatField,
+  ChatHeader,
+  ChatInfoContainer,
+  ChatInput,
+  ChatStatus,
+  CloseChatButton,
+  MessageBubble,
+  MessagesContainer,
+  SendButton,
+} from "./Chat.styles";
+import { Message } from "./types";
+import {
+  ChatBubbleOutlineOutlined,
+  KeyboardDoubleArrowRight,
+  RotateLeftOutlined,
+} from "@mui/icons-material";
+import { IconButton, Typography } from "@mui/material";
 
 export const Chat = () => {
   const { callApi } = useContext(WebviewContext);
-  const [messages, setMessages] = useState(
-    [] as { role: string; content: string }[]
-  );
+
+  const [messages, setMessages] = useState([] as Message[]);
   const [input, setInput] = useState("");
+
+  const [isStreaming, setIsStreaming] = useState(false);
 
   const addChatBubble = (content: string, role: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, role }]);
@@ -99,27 +45,54 @@ export const Chat = () => {
     }
   };
 
+  const resetMessageHistory = () => {
+    // TODO
+    callApi("resetMessageHistory");
+    setMessages([]);
+  };
+
   useEffect(() => {
     const fetchMessages = async () => {
       setMessages(await callApi("getMessagesFromClient"));
     };
     fetchMessages();
+
+    setInterval(() => {
+      fetchMessages();
+    }, 1000);
   }, []);
 
   return (
     <ChatContainer>
+      {/* <ChatHeader> */}
+      {/* <CloseChatButton>
+          <KeyboardDoubleArrowRight />
+        </CloseChatButton> */}
+      {/* <ChatInfoContainer> */}
+      {/* <Typography variant={"h5"}>RAiDer</Typography> */}
+      {/* <ChatStatus disabled>
+            <ChatBubbleOutlineOutlined sx={{ width: "16px", height: "16px" }} />
+            <Typography variant={"caption"} sx={{ color: "#43ff00" }}>
+              Active
+            </Typography>
+          </ChatStatus> */}
+      {/* </ChatInfoContainer> */}
+      {/* <IconButton
+          aria-label="reset conversation"
+          onClick={resetMessageHistory}
+        >
+          <RotateLeftOutlined style={{ color: "white" }} />
+        </IconButton> */}
+      {/* </ChatHeader> */}
       <MessagesContainer>
         {messages.map((msg, index) => (
           <MessageBubble message={msg} key={index} />
         ))}
       </MessagesContainer>
-      <ChatInput
-        rows={2}
-        cols={50}
-        value={input}
-        onChange={(e) => setInput((e.target as HTMLTextAreaElement).value)}
-      />
-      <SendButton onClick={handleSend}>Send</SendButton>
+      <ChatField input={input} setInput={setInput} handleSend={handleSend} />
+      {/* <SendButton variant="contained" onClick={handleSend}>
+        Send
+      </SendButton> */}
     </ChatContainer>
   );
 };

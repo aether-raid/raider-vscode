@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import { WebviewApi, WithWebviewContext } from "./WebviewContext";
 import { Chat } from "./Chat";
 import { Terminal } from "./Terminal";
+import ThemeProvider from "@mui/material/styles/ThemeProvider";
+import { theme } from "./theme/theme";
 
 export const Views = {
   raiderChat: Chat,
@@ -29,7 +31,9 @@ export function render<V extends ViewKey>(
 
   root.render(
     <WithWebviewContext vscodeApi={vscodeApi}>
-      <Component />
+      <ThemeProvider theme={theme}>
+        <Component />
+      </ThemeProvider>
     </WithWebviewContext>
   );
 }
