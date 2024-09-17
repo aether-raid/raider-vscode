@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, Card, CardContent } from "@mui/material";
 import { ChatBubbleOutline } from "@mui/icons-material";
 
 interface Session {
@@ -27,17 +27,6 @@ export const History = () => {
     },
   ]);
 
-  // const addSession = (query: string) => {
-  //   setSessions((prevSessions: Session[]) => [
-  //     ...prevSessions,
-  //     { query, workspace: "raider-chat", timestamp: new Date() },
-  //   ]);
-  // };
-
-  // const handleUserQuery = (query: string) => {
-  //   addSession(query); // Call addSession when you receive a user query
-  // };
-
   return (
     <Box>
       <Grid container alignItems="center">
@@ -47,15 +36,17 @@ export const History = () => {
       <ul>
         {sessions.map((session, index) => (
           <li key={index}>
-            <Box>
-              <Typography variant="body2">
-                {session.query} - {session.timestamp.toLocaleString()}
-              </Typography>
-            </Box>
+            {/* Wrap each session with a Card component */}
+            <Card>
+              <CardContent>
+                <Typography variant="body2">
+                  {session.query} - {session.timestamp.toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
           </li>
         ))}
       </ul>
-      {/* <button onClick={() => handleUserQuery('Example query')}>Send Query</button> */}
     </Box>
   );
 };
