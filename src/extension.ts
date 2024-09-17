@@ -10,15 +10,19 @@ import {
   ViewApiResponse,
   ViewEvents,
 } from "./viewApi";
-import fs from "node:fs/promises";
+// import fs from "node:fs/promises";
 import { SessionManager } from "./sessionManager";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
 
+  console.log("raider: ", ctx.storageUri || "no uri???");
+  console.log("raider: ", ctx.storageUri?.path || "no path???");
+  console.log("raider: ", ctx.storageUri?.fsPath || "no fspath???");
+
   const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
 
-  const messages = [] as Message[];
+  // const messages = [] as Message[];
 
   // const currentSessionId = uuid
 
@@ -124,9 +128,22 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
   });
 
+  vscode.commands.registerCommand("raider.chat", () => {
+    // TODO
+    console.log("raider.chat called");
+    triggerEvent("showChatPage");
+  });
+
   vscode.commands.registerCommand("raider.history", () => {
     // TODO
-    triggerEvent("showSessionPage");
+    console.log("raider.history called");
+    triggerEvent("showHistoryPage");
+  });
+
+  vscode.commands.registerCommand("raider.settings", () => {
+    // TODO
+    console.log("raider.settings called");
+    triggerEvent("showSettingsPage");
   });
 };
 

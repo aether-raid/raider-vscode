@@ -54,10 +54,24 @@
         "group": "Raider"
       },
       {
+        "command": "raider.chat",
+        "title": "View Chat",
+        "category": "Raider",
+        "icon": "$(comment-discussion)",
+        "group": "Raider"
+      },
+      {
         "command": "raider.history",
         "title": "View Session History",
         "category": "Raider",
         "icon": "$(history)",
+        "group": "Raider"
+      },
+      {
+        "command": "raider.settings",
+        "title": "Settings",
+        "category": "Raider",
+        "icon": "$(settings-gear)",
         "group": "Raider"
       }
     ],
@@ -69,7 +83,17 @@
           "when": "view == raiderChat"
         },
         {
+          "command": "raider.chat",
+          "group": "navigation@1",
+          "when": "view == raiderChat"
+        },
+        {
           "command": "raider.history",
+          "group": "navigation@1",
+          "when": "view == raiderChat"
+        },
+        {
+          "command": "raider.settings",
           "group": "navigation@1",
           "when": "view == raiderChat"
         }
