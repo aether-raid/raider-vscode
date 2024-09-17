@@ -211,22 +211,20 @@ export class SessionManager {
     }
   }
 
-  openSession(sessionId: string) {
-    if (this.isSession(sessionId)) {
-      this.currentSession = sessionId;
-    } else {
-      this.newNamedSession(sessionId);
-      this.currentSession = sessionId;
+  openSession(sessionId: string = "") {
+    if (sessionId.length == 0) {
+      sessionId = this.newSession();
+    } else if (!this.isSession(sessionId)) {
+      this.newSession(sessionId);
     }
+    this.currentSession = sessionId;
   }
 
-  newSession(): string {
-    let sessionId: string;
-    while ((sessionId = uuid4()) in this.sessions) {}
-    return this.newNamedSession(sessionId);
-  }
-
-  newNamedSession(sessionId: string): string {
+  newSession(sessionId: string = ""): string {
+    // let sessionId: string;
+    if (sessionId.length == 0) {
+      while ((sessionId = uuid4()) in this.sessions) {}
+    }
     this.sessions[sessionId] = new Session(sessionId);
     return sessionId;
   }

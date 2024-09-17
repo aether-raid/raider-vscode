@@ -128,6 +128,10 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
   });
 
+  vscode.commands.registerCommand("raider.new", () => {
+    sessionManager.openSession();
+  });
+
   type Page = "chat" | "history" | "settings";
 
   let pages: Page[] = ["chat", "history", "settings"];

@@ -54,6 +54,13 @@
         "group": "Raider"
       },
       {
+        "command": "raider.new",
+        "title": "New Session",
+        "category": "Raider",
+        "icon": "$(plus)",
+        "group": "Raider"
+      },
+      {
         "command": "raider.chat",
         "title": "View Chat",
         "category": "Raider",
@@ -69,7 +76,7 @@
       },
       {
         "command": "raider.settings",
-        "title": "Settings",
+        "title": "View Settings",
         "category": "Raider",
         "icon": "$(settings-gear)",
         "group": "Raider"
@@ -77,6 +84,11 @@
     ],
     "menus": {
       "view/title": [
+        {
+          "command": "raider.new",
+          "group": "navigation@1",
+          "when": "view == raiderChat"
+        },
         {
           "command": "raider.reset",
           "group": "navigation@1",
