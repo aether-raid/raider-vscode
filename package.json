@@ -50,6 +50,13 @@
         "command": "raider.reset",
         "title": "Reset History",
         "category": "Raider",
+        "icon": "$(debug-restart)",
+        "group": "Raider"
+      },
+      {
+        "command": "raider.history",
+        "title": "View Session History",
+        "category": "Raider",
         "icon": "$(history)",
         "group": "Raider"
       }
@@ -58,6 +65,11 @@
       "view/title": [
         {
           "command": "raider.reset",
+          "group": "navigation@1",
+          "when": "view == raiderChat"
+        },
+        {
+          "command": "raider.history",
           "group": "navigation@1",
           "when": "view == raiderChat"
         }

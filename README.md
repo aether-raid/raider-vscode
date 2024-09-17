@@ -19,3 +19,10 @@ Things to add (not in order):
 - [ ] Implement keybinds???
 - [ ] Add Web Raider page
 - [ ] Integrate [`ThePyProgrammer/web-raider`](https://github.com/ThePyProgrammer/web-raider) with Raider Chat
+- [ ] Add GitHub API key as an option in settings
+
+## Planned Pages
+
+### Session History Page
+
+List of sessions

@@ -118,7 +118,7 @@ export const ChatInputContainer = styled(Box)`
 `;
 
 export const ChatInput = styled(OutlinedInput)`
-  background-color: #333;
+  background-color: #313244;
   color: white;
   border: 1px solid #555;
   border-radius: 4px;

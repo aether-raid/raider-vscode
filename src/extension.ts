@@ -11,11 +11,16 @@ import {
   ViewEvents,
 } from "./viewApi";
 import fs from "node:fs/promises";
+import { SessionManager } from "./sessionManager";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
 
+  const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
+
   const messages = [] as Message[];
+
+  // const currentSessionId = uuid
 
   const triggerEvent = <E extends keyof ViewEvents>(
     key: E,
@@ -55,10 +60,10 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       triggerEvent("exampleBMessage", msg);
     },
     sendMessageToClient: (msg: Message) => {
-      messages.push(msg);
+      sessionManager.getCurrentSession().message(msg.role, msg.content);
     },
     getMessagesFromClient: () => {
-      return messages;
+      return sessionManager.getCurrentSession().messages;
     },
     resetMessageHistory: () => {
       messages.length = 0;
@@ -110,8 +115,13 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   // registerAndConnectView("raiderTerminal");
 
   vscode.commands.registerCommand("raider.reset", () => {
-    // messages.length = 0;
-    api.getResetCommand();
+    sessionManager.getCurrentSession().reset();
+    console.log("raider.reset called");
+    // api.getResetCommand();
+  });
+
+  vscode.commands.registerCommand("raider.history", () => {
+    // TODO
   });
 };
 

@@ -1,24 +1,25 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+// import { useRef } from "react";
 import { WebviewContext } from "./WebviewContext";
 import {
   ChatContainer,
   ChatField,
-  ChatHeader,
-  ChatInfoContainer,
-  ChatInput,
-  ChatStatus,
-  CloseChatButton,
+  // ChatHeader,
+  // ChatInfoContainer,
+  // ChatInput,
+  // ChatStatus,
+  // CloseChatButton,
   MessageBubble,
   MessagesContainer,
-  SendButton,
+  // SendButton,
 } from "./Chat.styles";
 import { Message } from "./types";
-import {
-  ChatBubbleOutlineOutlined,
-  KeyboardDoubleArrowRight,
-  RotateLeftOutlined,
-} from "@mui/icons-material";
-import { IconButton, Typography } from "@mui/material";
+// import {
+//   ChatBubbleOutlineOutlined,
+//   KeyboardDoubleArrowRight,
+//   RotateLeftOutlined,
+// } from "@mui/icons-material";
+// import { IconButton, Typography } from "@mui/material";
 
 export const Chat = () => {
   const { callApi } = useContext(WebviewContext);
@@ -26,7 +27,7 @@ export const Chat = () => {
   const [messages, setMessages] = useState([] as Message[]);
   const [input, setInput] = useState("");
 
-  const [isStreaming, setIsStreaming] = useState(false);
+  // const [isStreaming, setIsStreaming] = useState(false);
 
   const addChatBubble = (content: string, role: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, role }]);
@@ -45,11 +46,11 @@ export const Chat = () => {
     }
   };
 
-  const resetMessageHistory = () => {
-    // TODO
-    callApi("resetMessageHistory");
-    setMessages([]);
-  };
+  // const resetMessageHistory = () => {
+  //   // TODO
+  //   callApi("resetMessageHistory");
+  //   setMessages([]);
+  // };
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -59,7 +60,7 @@ export const Chat = () => {
 
     setInterval(() => {
       fetchMessages();
-    }, 1000);
+    }, 500);
   }, []);
 
   return (
