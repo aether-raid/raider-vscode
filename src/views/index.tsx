@@ -1,12 +1,12 @@
 import { createRoot } from "react-dom/client";
 import { WebviewApi, WithWebviewContext } from "./WebviewContext";
-import { Chat } from "./Chat";
+import { Sidebar } from "./Sidebar";
 // import { Terminal } from "./Terminal";
 import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import { theme } from "./theme/theme";
 
 export const Views = {
-  raiderChat: Chat,
+  raiderChat: Sidebar,
   // raiderTerminal: Terminal,
 } as const;
 
