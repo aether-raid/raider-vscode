@@ -75,6 +75,13 @@
         "group": "Raider"
       },
       {
+        "command": "raider.codebases",
+        "title": "View Codebases",
+        "category": "Raider",
+        "icon": "$(repo)",
+        "group": "Raider"
+      },
+      {
         "command": "raider.settings",
         "title": "View Settings",
         "category": "Raider",
@@ -101,6 +108,11 @@
         },
         {
           "command": "raider.history",
+          "group": "navigation@1",
+          "when": "view == raiderChat"
+        },
+        {
+          "command": "raider.codebases",
           "group": "navigation@1",
           "when": "view == raiderChat"
         },

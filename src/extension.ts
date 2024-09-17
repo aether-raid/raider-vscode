@@ -132,9 +132,9 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     sessionManager.openSession();
   });
 
-  type Page = "chat" | "history" | "settings";
+  type Page = "chat" | "history" | "codebases" | "settings";
 
-  let pages: Page[] = ["chat", "history", "settings"];
+  let pages: Page[] = ["chat", "history", "codebases", "settings"];
 
   pages.forEach((page) => {
     vscode.commands.registerCommand(`raider.${page}`, () => {
