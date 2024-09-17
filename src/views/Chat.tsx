@@ -22,7 +22,7 @@ import { Message } from "./types";
 // import { IconButton, Typography } from "@mui/material";
 
 export const Chat = () => {
-  const { callApi } = useContext(WebviewContext);
+  const { callApi, addListener, removeListener } = useContext(WebviewContext);
 
   const [messages, setMessages] = useState([] as Message[]);
   const [input, setInput] = useState("");
@@ -31,7 +31,7 @@ export const Chat = () => {
 
   const addChatBubble = (content: string, role: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, role }]);
-    callApi("sendMessageToClient", { role, content });
+    callApi("sendMessage", { role, content });
   };
 
   const handleSend = () => {
@@ -54,13 +54,24 @@ export const Chat = () => {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      setMessages(await callApi("getMessagesFromClient"));
+      setMessages(await callApi("getMessages"));
     };
     fetchMessages();
 
-    setInterval(() => {
+    const getMessagesSent = (messages: Message[]) => {
+      setMessages(messages);
+    };
+
+    addListener("sendMessages", getMessagesSent);
+
+    let interval = setInterval(() => {
       fetchMessages();
     }, 500);
+
+    return () => {
+      removeListener("sendMessages", getMessagesSent);
+      clearInterval(interval);
+    };
   }, []);
 
   return (

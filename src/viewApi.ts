@@ -29,16 +29,18 @@ export type Message = {
 };
 
 export type ViewApi = {
-  getFileContents: () => Promise<string>;
-  showExampleViewB: () => void;
-  sendMessageToExampleB: (msg: string) => void;
-  sendMessageToClient: (msg: Message) => void;
-  getMessagesFromClient: () => Message[];
-  resetMessageHistory: () => void;
-  getResetCommand: () => void;
+  // getFileContents: () => Promise<string>;
+  // showExampleViewB: () => void;
+  // sendMessageToExampleB: (msg: string) => void;
+  sendMessage: (msg: Message) => void;
+  getMessages: () => Message[];
+  // resetMessageHistory: () => void;
+  // getResetCommand: () => void;
+  openSessionChat: (sessionId: string) => void;
 };
 
 export type ViewEvents = {
-  exampleBMessage: (a: string) => void;
+  // exampleBMessage: (a: string) => void;
   showSessionPage: () => void;
+  sendMessages: (messages: Message[]) => void;
 };
