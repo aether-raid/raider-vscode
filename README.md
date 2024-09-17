@@ -10,7 +10,7 @@ The extension is a single chat view.
 
 Things to add (not in order):
 
-- [ ] Integrate [`sikfeng/aider-agent`](https://github.com/sikfeng/aider-agent) with Raider Chat
+- [ ] Integrate [`sikfeng/raider-backend`](https://github.com/sikfeng/raider-backend) with Raider Chat
 - [ ] Implement multiple sessions + a session history view
 - [ ] Implement support for multiple models
 - [ ] Implement "existing codebases" view
