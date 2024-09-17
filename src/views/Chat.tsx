@@ -109,7 +109,7 @@ export const Chat = () => {
   );
 };
 
-export const ExampleViewA = () => {
+/* export const ExampleViewA = () => {
   const { callApi } = useContext(WebviewContext);
   const [bMessage, setBMessage] = useState<string>("");
 
@@ -141,4 +141,4 @@ export const ExampleViewA = () => {
       </div>
     </div>
   );
-};
+}; */
