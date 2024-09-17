@@ -50,7 +50,7 @@
         "command": "raider.reset",
         "title": "Reset History",
         "category": "Raider",
-        "icon": "$(debug-restart)",
+        "icon": "$(refresh)",
         "group": "Raider"
       },
       {
