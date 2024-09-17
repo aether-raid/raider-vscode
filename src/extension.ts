@@ -36,40 +36,44 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   };
 
   const api: ViewApi = {
-    getFileContents: async () => {
-      const uris = await vscode.window.showOpenDialog({
-        canSelectFiles: true,
-        canSelectFolders: false,
-        canSelectMany: false,
-        openLabel: "Select file",
-        title: "Select file to read",
-      });
+    // getFileContents: async () => {
+    //   const uris = await vscode.window.showOpenDialog({
+    //     canSelectFiles: true,
+    //     canSelectFolders: false,
+    //     canSelectMany: false,
+    //     openLabel: "Select file",
+    //     title: "Select file to read",
+    //   });
 
-      if (!uris?.length) {
-        return "";
-      }
+    //   if (!uris?.length) {
+    //     return "";
+    //   }
 
-      const contents = await fs.readFile(uris[0].fsPath, "utf-8");
-      return contents;
-    },
-    showExampleViewB: () => {
-      connectedViews?.raiderTerminal?.show?.(true);
-      vscode.commands.executeCommand(`raiderTerminal.focus`);
-    },
-    sendMessageToExampleB: (msg: string) => {
-      triggerEvent("exampleBMessage", msg);
-    },
-    sendMessageToClient: (msg: Message) => {
+    //   const contents = await fs.readFile(uris[0].fsPath, "utf-8");
+    //   return contents;
+    // },
+    // showExampleViewB: () => {
+    //   connectedViews?.raiderTerminal?.show?.(true);
+    //   vscode.commands.executeCommand(`raiderTerminal.focus`);
+    // },
+    // sendMessageToExampleB: (msg: string) => {
+    //   triggerEvent("exampleBMessage", msg);
+    // },
+    sendMessage: (msg: Message) => {
       sessionManager.getCurrentSession().message(msg.role, msg.content);
     },
-    getMessagesFromClient: () => {
+    getMessages: () => {
       return sessionManager.getCurrentSession().messages;
     },
-    resetMessageHistory: () => {
-      messages.length = 0;
-    },
-    getResetCommand: () => {
-      console.log("reset");
+    // resetMessageHistory: () => {
+    //   messages.length = 0;
+    // },
+    // getResetCommand: () => {
+    //   console.log("reset");
+    // },
+    openSessionChat: async (sessionId: string) => {
+      sessionManager.openSession(sessionId);
+      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
   };
 
@@ -117,7 +121,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   vscode.commands.registerCommand("raider.reset", () => {
     sessionManager.getCurrentSession().reset();
     console.log("raider.reset called");
-    // api.getResetCommand();
+    triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
   });
 
   vscode.commands.registerCommand("raider.history", () => {

@@ -191,6 +191,10 @@ export class SessionManager {
     return Object.keys(this.sessions);
   }
 
+  numSessions(): number {
+    return this.getSessionIds().length;
+  }
+
   getCurrentSession(): Session {
     if (this.currentSession) {
       return this.sessions[this.currentSession];
@@ -209,8 +213,10 @@ export class SessionManager {
 
   openSession(sessionId: string) {
     if (this.isSession(sessionId)) {
+      this.currentSession = sessionId;
     } else {
       this.newNamedSession(sessionId);
+      this.currentSession = sessionId;
     }
   }
 
