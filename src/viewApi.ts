@@ -40,4 +40,5 @@ export type ViewApi = {
 
 export type ViewEvents = {
   exampleBMessage: (a: string) => void;
+  showSessionPage: () => void;
 };

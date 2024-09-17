@@ -122,6 +122,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
 
   vscode.commands.registerCommand("raider.history", () => {
     // TODO
+    triggerEvent("showSessionPage");
   });
 };
 
