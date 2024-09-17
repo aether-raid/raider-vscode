@@ -69,6 +69,9 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     getMessages: () => {
       return sessionManager.getCurrentSession().messages;
     },
+    getSessions: () => {
+      return sessionManager.export();
+    },
     // resetMessageHistory: () => {
     //   messages.length = 0;
     // },
@@ -77,6 +80,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     // },
     openSessionChat: async (sessionId: string) => {
       sessionManager.openSession(sessionId);
+      triggerEvent("showPage", "chat");
       triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
   };

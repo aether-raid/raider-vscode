@@ -23,8 +23,9 @@ export class SessionNotFoundError extends Error {
 }
 
 export type SessionData = {
-  messages: Message[];
   id: string;
+  messages: Message[];
+  lastUpdated: Date | null;
 };
 
 export class Session {
@@ -35,6 +36,8 @@ export class Session {
 
   fileExists: boolean;
   savedToFile: boolean;
+
+  lastUpdated: Date | null = null;
 
   constructor(id: string) {
     this.id = id;
@@ -62,6 +65,7 @@ export class Session {
 
   message(role: string, content: string) {
     this.messages.push({ role, content });
+    this.lastUpdated = new Date();
   }
 
   static async setStorage(dir: string): Promise<boolean> {
@@ -103,11 +107,19 @@ export class Session {
     if (!changed) this.messages = messages;
   }
 
+  export(): SessionData {
+    return {
+      id: this.id,
+      messages: this.messages,
+      lastUpdated: this.lastUpdated,
+    };
+  }
+
   async save(): Promise<boolean> {
     try {
       await fs.writeFile(
         this.getFilePath(),
-        JSON.stringify({ id: this.id, messages: this.messages }),
+        JSON.stringify(this.export()),
         "utf8"
       );
       this.fileExists = true;
@@ -193,6 +205,28 @@ export class SessionManager {
 
   numSessions(): number {
     return this.getSessionIds().length;
+  }
+
+  export(): {
+    id: string;
+    messages: Message[];
+    lastUpdated: Date;
+  }[] {
+    return Object.values(this.sessions)
+      .map((it) => it.export())
+      .filter((it) => it.messages.length > 0 && it.lastUpdated != null)
+      .sort((a, b) => {
+        if ((a.lastUpdated ?? new Date()) < (b.lastUpdated ?? new Date())) {
+          return 1;
+        } else {
+          return -1;
+        }
+      })
+      .map(({ id, messages, lastUpdated }) => ({
+        id: id,
+        messages: messages,
+        lastUpdated: lastUpdated ?? new Date(),
+      }));
   }
 
   getCurrentSession(): Session {

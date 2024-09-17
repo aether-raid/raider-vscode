@@ -28,12 +28,19 @@ export type Message = {
   content: string;
 };
 
+export type Session = {
+  id: string;
+  messages: Message[];
+  lastUpdated: Date;
+};
+
 export type ViewApi = {
   // getFileContents: () => Promise<string>;
   // showExampleViewB: () => void;
   // sendMessageToExampleB: (msg: string) => void;
   sendMessage: (msg: Message) => void;
   getMessages: () => Message[];
+  getSessions: () => Session[];
   // resetMessageHistory: () => void;
   // getResetCommand: () => void;
   openSessionChat: (sessionId: string) => void;
@@ -45,5 +52,6 @@ export type ViewEvents = {
   showHistoryPage: () => void;
   showSettingsPage: () => void;
   sendMessages: (messages: Message[]) => void;
+  sendHistory: (sessions: Session[]) => void;
   showPage: (page: "chat" | "history" | "codebases" | "settings") => void;
 };
