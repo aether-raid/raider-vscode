@@ -45,4 +45,5 @@ export type ViewEvents = {
   showHistoryPage: () => void;
   showSettingsPage: () => void;
   sendMessages: (messages: Message[]) => void;
+  showPage: (page: "chat" | "history" | "settings") => void;
 };

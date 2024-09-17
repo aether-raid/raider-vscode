@@ -6,26 +6,22 @@ import { History } from "./History";
 export const Sidebar = () => {
   const { callApi, addListener, removeListener } = useContext(WebviewContext);
 
-  const [isHistoryPage, setHistoryPage] = useState(false);
+  // const [isHistoryPage, setHistoryPage] = useState(false);
+  const [currentPage, setCurrentPage] = useState<
+    "chat" | "history" | "settings"
+  >("chat");
 
   useEffect(() => {
-    const toggleSessionPage = () => {
-      // logic for converting Chat view to Session view
-      setHistoryPage(true);
+    const showPage = (page: "chat" | "history" | "settings") => {
+      console.log(page, "cooked");
+      setCurrentPage(page);
     };
-    const toggleChatPage = () => {
-      // logic for converting Chat view to Session view
-      setHistoryPage(false);
-    };
-
-    addListener("showHistoryPage", toggleSessionPage);
-    addListener("showChatPage", toggleChatPage);
+    addListener("showPage", showPage);
 
     return () => {
-      removeListener("showHistoryPage", toggleSessionPage);
-      removeListener("showChatPage", toggleChatPage);
+      removeListener("showPage", showPage);
     };
   }, []);
 
-  return isHistoryPage ? <History /> : <Chat />;
+  return currentPage == "history" ? <History /> : <Chat />;
 };

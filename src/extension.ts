@@ -128,23 +128,36 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
   });
 
-  vscode.commands.registerCommand("raider.chat", () => {
-    // TODO
-    console.log("raider.chat called");
-    triggerEvent("showChatPage");
+  type Page = "chat" | "history" | "settings";
+
+  let pages: Page[] = ["chat", "history", "settings"];
+
+  pages.forEach((page) => {
+    vscode.commands.registerCommand(`raider.${page}`, () => {
+      // TODO
+      console.log(`raider.${page} called`);
+      console.log(page, "cooked");
+      triggerEvent("showPage", page);
+    });
   });
 
-  vscode.commands.registerCommand("raider.history", () => {
-    // TODO
-    console.log("raider.history called");
-    triggerEvent("showHistoryPage");
-  });
+  // vscode.commands.registerCommand("raider.chat", () => {
+  //   // TODO
+  //   console.log("raider.chat called");
+  //   triggerEvent("showChatPage");
+  // });
 
-  vscode.commands.registerCommand("raider.settings", () => {
-    // TODO
-    console.log("raider.settings called");
-    triggerEvent("showSettingsPage");
-  });
+  // vscode.commands.registerCommand("raider.history", () => {
+  //   // TODO
+  //   console.log("raider.history called");
+  //   triggerEvent("showHistoryPage");
+  // });
+
+  // vscode.commands.registerCommand("raider.settings", () => {
+  //   // TODO
+  //   console.log("raider.settings called");
+  //   triggerEvent("showSettingsPage");
+  // });
 };
 
 export const deactivate = () => {
