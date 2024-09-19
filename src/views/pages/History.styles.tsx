@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Card, CardContent } from "@mui/material";
+import { Box, Typography, Card } from "@mui/material";
 import styled from "@emotion/styled";
 
 export const SessionContainer = styled(Box)`
@@ -21,14 +21,13 @@ export const SessionCard = styled(Card)`
   max-width: 100%;
   color: white;
   background-color: #000053;
-  margin: 5px 5px;
+  margin: 10px 10px;
   border-radius: 10px;
   white-space: pre-line;
 `;
 
 export const Fonttype = styled(Typography)`
-  font-size:15px;
-
+  font-size: 15px;
 `;
 
 /**

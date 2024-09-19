@@ -44,6 +44,7 @@ export type ViewApi = {
   // resetMessageHistory: () => void;
   // getResetCommand: () => void;
   openSessionChat: (sessionId: string) => void;
+  navigateTo: (page: "chat" | "history" | "codebases" | "settings") => void;
 };
 
 export type ViewEvents = {

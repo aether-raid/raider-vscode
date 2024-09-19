@@ -1,18 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
-  Box,
+  // Box,
   Grid,
   Typography,
-  Card,
+  // Card,
   CardContent,
   CardActionArea,
   IconButton,
 } from "@mui/material";
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
-import { ChatBubbleOutline, ChatBubble } from "@mui/icons-material";
+// import { ChatBubbleOutline, ChatBubble } from "@mui/icons-material";
 import { Message } from "../types";
 import { WebviewContext } from "../WebviewContext";
-import { SessionCard, SessionContainer, Fonttype } from "./History.styles";
+import {
+  SessionCard,
+  SessionContainer,
+  // Fonttype
+} from "./History.styles";
 
 interface Session {
   id: string;
@@ -88,7 +92,7 @@ export const History = () => {
   return (
     <SessionContainer>
       <Grid container alignItems="center">
-        <IconButton onClick={() => /* Handle back button click */}>
+        <IconButton onClick={() => callApi("navigateTo", "chat")}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" component="div">
@@ -100,7 +104,12 @@ export const History = () => {
           <SessionCard key={index}>
             <CardActionArea onClick={() => openSessionChat(session)}>
               <CardContent>
-                <Typography gutterBottom variant="h4" component="div">
+                <Typography
+                  gutterBottom
+                  variant="h4"
+                  component="div"
+                  sx={{ fontSize: "15px" }}
+                >
                   {getFirstQuery(session.messages)}
                 </Typography>
                 <Typography

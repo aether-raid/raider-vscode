@@ -83,6 +83,10 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       triggerEvent("showPage", "chat");
       triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
+    navigateTo: (page: "chat" | "history" | "codebases" | "settings") => {
+      console.log("navigate to", page, "called");
+      triggerEvent("showPage", page);
+    },
   };
 
   const isViewApiRequest = <K extends keyof ViewApi>(
