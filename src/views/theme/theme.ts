@@ -40,6 +40,7 @@ export const theme = createTheme({
       light: "#42a5f5",
       dark: "#1565c0",
     },
+    error: { main: "#d32f2f" },
   },
   typography: {
     fontFamily: fontArray,

@@ -78,6 +78,16 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     // getResetCommand: () => {
     //   console.log("reset");
     // },
+    newSession: () => {
+      console.log("new session???");
+      triggerEvent("showPage", "chat");
+      sessionManager.openSession();
+    },
+    deleteSession: (sessionId: string) => {
+      console.log("delete", sessionId);
+      sessionManager.deleteSession(sessionId);
+      triggerEvent("sendHistory", sessionManager.export());
+    },
     openSessionChat: async (sessionId: string) => {
       sessionManager.openSession(sessionId);
       triggerEvent("showPage", "chat");

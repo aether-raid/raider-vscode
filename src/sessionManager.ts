@@ -263,6 +263,10 @@ export class SessionManager {
     return sessionId;
   }
 
+  deleteSession(sessionId: string) {
+    delete this.sessions[sessionId];
+  }
+
   isSession(sessionId: string): boolean {
     return sessionId in this.sessions;
   }

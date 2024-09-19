@@ -1,4 +1,4 @@
-import { Box, Typography, Card } from "@mui/material";
+import { Box, Typography, Card, IconButton } from "@mui/material";
 import styled from "@emotion/styled";
 
 export const SessionContainer = styled(Box)`
@@ -24,6 +24,32 @@ export const SessionCard = styled(Card)`
   margin: 10px 10px;
   border-radius: 10px;
   white-space: pre-line;
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+`;
+
+export const SessionCardView = styled(Box)`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  overflow: hidden;
+`;
+
+export const SessionCardMenu = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
+export const DeleteButton = styled(IconButton)`
+  &:hover {
+    color: #ff7f7f;
+  }
+  padding-bottom: 10px;
 `;
 
 export const Fonttype = styled(Typography)`

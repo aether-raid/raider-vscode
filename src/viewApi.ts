@@ -43,6 +43,8 @@ export type ViewApi = {
   getSessions: () => Session[];
   // resetMessageHistory: () => void;
   // getResetCommand: () => void;
+  newSession: () => void;
+  deleteSession: (sessionId: string) => void;
   openSessionChat: (sessionId: string) => void;
   navigateTo: (page: "chat" | "history" | "codebases" | "settings") => void;
 };
