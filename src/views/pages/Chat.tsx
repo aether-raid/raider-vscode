@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 // import { useRef } from "react";
-import { WebviewContext } from "./WebviewContext";
+import { WebviewContext } from "../WebviewContext";
 import {
   ChatContainer,
   ChatField,
@@ -13,7 +13,7 @@ import {
   MessagesContainer,
   // SendButton,
 } from "./Chat.styles";
-import { Message } from "./types";
+import { Message } from "../types";
 // import {
 //   ChatBubbleOutlineOutlined,
 //   KeyboardDoubleArrowRight,

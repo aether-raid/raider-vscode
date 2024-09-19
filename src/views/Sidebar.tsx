@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "./WebviewContext";
-import { Chat } from "./Chat";
-import { History } from "./History";
+import { Chat } from "./pages/Chat";
+import { History } from "./pages/History";
 
 type Page = "chat" | "history" | "codebases" | "settings";
 

@@ -8,8 +8,8 @@ import {
   OutlinedInput,
   IconButton,
 } from "@mui/material";
-import { Message } from "./types";
-import { ThemeButton, fontArray } from "./theme/theme";
+import { Message } from "../types";
+import { ThemeButton, fontArray } from "../theme/theme";
 import { SendOutlined } from "@mui/icons-material";
 
 export type ChatBubbleProps = {

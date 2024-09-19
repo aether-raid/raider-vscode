@@ -8,8 +8,8 @@ import {
   CardActionArea,
 } from "@mui/material";
 import { ChatBubbleOutline } from "@mui/icons-material";
-import { Message } from "./types";
-import { WebviewContext } from "./WebviewContext";
+import { Message } from "../types";
+import { WebviewContext } from "../WebviewContext";
 import { SessionCard, SessionContainer } from "./History.styles";
 
 interface Session {
