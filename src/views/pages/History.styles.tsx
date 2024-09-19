@@ -14,16 +14,21 @@ export const SessionContainer = styled(Box)`
   }
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding-bottom: 20px;
+  padding-bottom: 13px;
 `;
 
 export const SessionCard = styled(Card)`
   max-width: 100%;
   color: white;
-  background-color: #007acc;
-  margin: 5px 10px;
+  background-color: #000053;
+  margin: 5px 5px;
   border-radius: 10px;
   white-space: pre-line;
+`;
+
+export const Fonttype = styled(Typography)`
+  font-size:15px;
+
 `;
 
 /**

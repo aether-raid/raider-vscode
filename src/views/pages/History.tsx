@@ -6,11 +6,13 @@ import {
   Card,
   CardContent,
   CardActionArea,
+  IconButton,
 } from "@mui/material";
-import { ChatBubbleOutline } from "@mui/icons-material";
+import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
+import { ChatBubbleOutline, ChatBubble } from "@mui/icons-material";
 import { Message } from "../types";
 import { WebviewContext } from "../WebviewContext";
-import { SessionCard, SessionContainer } from "./History.styles";
+import { SessionCard, SessionContainer, Fonttype } from "./History.styles";
 
 interface Session {
   id: string;
@@ -85,29 +87,33 @@ export const History = () => {
 
   return (
     <SessionContainer>
-      {/* <Grid container alignItems="center">
-        <ChatBubbleOutline />
-        <Typography variant="h6">History</Typography>
-      </Grid> */}
-      {/* <ul> */}
-      {sessions.map((session, index) => (
-        <SessionCard key={index}>
-          <CardActionArea onClick={() => openSessionChat(session)}>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                {getFirstQuery(session.messages)}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", align: "right" }}
-              >
-                {session.lastUpdated.toLocaleString()}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </SessionCard>
-      ))}
-      {/* </ul> */}
+      <Grid container alignItems="center">
+        <IconButton onClick={() => /* Handle back button click */}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h6" component="div">
+          History
+        </Typography>
+      </Grid>
+      <ul>
+        {sessions.map((session, index) => (
+          <SessionCard key={index}>
+            <CardActionArea onClick={() => openSessionChat(session)}>
+              <CardContent>
+                <Typography gutterBottom variant="h4" component="div">
+                  {getFirstQuery(session.messages)}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "grey.500", align: "right" }}
+                >
+                  {session.lastUpdated.toLocaleString()}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </SessionCard>
+        ))}
+      </ul>
     </SessionContainer>
   );
 };
