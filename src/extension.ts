@@ -133,6 +133,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   });
 
   vscode.commands.registerCommand("raider.new", () => {
+    triggerEvent("showPage", "chat");
     sessionManager.openSession();
   });
 
