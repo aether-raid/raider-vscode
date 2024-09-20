@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Box, Grid, Typography, TextField } from '@mui/material';
-import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import React, { useState } from "react";
+import { Box, Grid, Typography, TextField } from "@mui/material";
+import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 
-const SettingsPage: React.FC = () => {
-  const [apiKey1, setApiKey1] = useState('');
-  const [apiKey2, setApiKey2] = useState('');
-  const [apiKey3, setApiKey3] = useState('');
+export const Settings = () => {
+  const [apiKey1, setApiKey1] = useState("");
+  const [apiKey2, setApiKey2] = useState("");
+  const [apiKey3, setApiKey3] = useState("");
 
   return (
     <Box>
@@ -35,5 +35,3 @@ const SettingsPage: React.FC = () => {
     </Box>
   );
 };
-
-export default SettingsPage;

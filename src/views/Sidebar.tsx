@@ -2,11 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "./WebviewContext";
 import { Chat } from "./pages/Chat";
 import { History } from "./pages/History";
+import { Settings } from "./pages/settings";
 
 type Page = "chat" | "history" | "codebases" | "settings";
 
 export const Sidebar = () => {
-  const {  addListener, removeListener } = useContext(WebviewContext);
+  const { addListener, removeListener } = useContext(WebviewContext);
 
   // const [isHistoryPage, setHistoryPage] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>("chat");
@@ -22,5 +23,11 @@ export const Sidebar = () => {
     };
   }, []);
 
-  return currentPage == "history" ? <History /> : <Chat />;
+  return currentPage == "history" ? (
+    <History />
+  ) : currentPage == "settings" ? (
+    <Settings />
+  ) : (
+    <Chat />
+  );
 };
