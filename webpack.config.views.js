@@ -37,6 +37,10 @@ module.exports = (env, { mode }) => {
           },
           exclude: /node_modules/u,
         },
+        {
+          test: /\.css$/,
+          use: ["style-loader", "css-loader"],
+        },
       ],
     },
     devServer: {
