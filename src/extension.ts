@@ -97,6 +97,12 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       console.log("navigate to", page, "called");
       triggerEvent("showPage", page);
     },
+    renderMarkdown: async (text: string) => {
+      return (await vscode.commands.executeCommand(
+        "markdown.api.render",
+        text
+      )) as string;
+    },
   };
 
   const isViewApiRequest = <K extends keyof ViewApi>(

@@ -11,6 +11,8 @@ import {
 import { Message } from "../types";
 import { ThemeButton, fontArray } from "../theme/theme";
 import { SendOutlined } from "@mui/icons-material";
+import { useContext, useEffect, useState } from "react";
+import { WebviewContext } from "../WebviewContext";
 
 export type ChatBubbleProps = {
   role: string;
@@ -28,23 +30,55 @@ function getRoleColor(role: string) {
 
 export const ChatBubbleContainer = styled.div<ChatBubbleProps>`
   max-width: 100%;
-  padding: 5px 10px;
+  padding: 10px 10px;
   color: white;
   align-self: ${(props) => (props.role === "user" ? "flex-end" : "flex-start")};
   background-color: ${(props) => getRoleColor(props.role)};
   margin: ${(props) => (props.role === "user" ? "8px" : "0px")};
   border-radius: ${(props) => (props.role === "user" ? "5px" : "0px")};
   white-space: pre-line;
+  font-family: ${fontArray};
 `;
 
-export type MessageBubbleProps = {
-  message: Message;
-};
+export class MessageBubbleProps {
+  message!: Message;
+  html?: boolean = true; // set false for debugging
+}
 
 export const MessageBubble = (props: MessageBubbleProps) => {
-  return (
+  const { callApi } = useContext(WebviewContext);
+  const [text, setText] = useState(props.message.content);
+
+  useEffect(() => {
+    async function render(text: string) {
+      let renderedText = (await callApi("renderMarkdown", text.trim())).trim();
+      setText(renderedText.replace(/^<[^>]+>|<\/[^>]+>$/gi, ""));
+    }
+
+    render(props.message.content);
+
+    let interval = setInterval(() => {
+      render(props.message.content);
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+  return true ? (
+    <ChatBubbleContainer
+      role={props.message.role}
+      dangerouslySetInnerHTML={{ __html: text }}
+    >
+      {/* <Typography fontFamily={fontArray}> */}
+      {/* {text} */}
+      {/* </Typography> */}
+    </ChatBubbleContainer>
+  ) : (
     <ChatBubbleContainer role={props.message.role}>
-      <Typography fontFamily={fontArray}>{props.message.content}</Typography>
+      {/* <Typography fontFamily={fontArray}> */}
+      {text}
+      {/* </Typography> */}
     </ChatBubbleContainer>
   );
 };
