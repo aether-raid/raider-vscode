@@ -230,7 +230,7 @@ export class SessionManager {
   }
 
   getCurrentSession(): Session {
-    if (this.currentSession) {
+    if (this.currentSession && this.isSession(this.currentSession)) {
       return this.sessions[this.currentSession];
     } else {
       let ids = this.getSessionIds();
@@ -265,6 +265,9 @@ export class SessionManager {
 
   deleteSession(sessionId: string) {
     delete this.sessions[sessionId];
+    if (this.currentSession == sessionId) {
+      this.currentSession = null;
+    }
   }
 
   isSession(sessionId: string): boolean {
