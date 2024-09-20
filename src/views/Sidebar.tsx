@@ -6,7 +6,7 @@ import { History } from "./pages/History";
 type Page = "chat" | "history" | "codebases" | "settings";
 
 export const Sidebar = () => {
-  const { callApi, addListener, removeListener } = useContext(WebviewContext);
+  const {  addListener, removeListener } = useContext(WebviewContext);
 
   // const [isHistoryPage, setHistoryPage] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>("chat");
