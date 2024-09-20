@@ -53,9 +53,9 @@ export type ViewApi = {
 
 export type ViewEvents = {
   // exampleBMessage: (a: string) => void;
-  showChatPage: () => void;
-  showHistoryPage: () => void;
-  showSettingsPage: () => void;
+  // showChatPage: () => void;
+  // showHistoryPage: () => void;
+  // showSettingsPage: () => void;
   sendMessages: (messages: Message[]) => void;
   sendHistory: (sessions: Session[]) => void;
   showPage: (page: "chat" | "history" | "codebases" | "settings") => void;

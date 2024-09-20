@@ -32,10 +32,13 @@ export const ChatBubbleContainer = styled.div<ChatBubbleProps>`
   max-width: 100%;
   padding: 10px 10px;
   color: white;
-  align-self: ${(props) => (props.role === "user" ? "flex-end" : "flex-start")};
-  background-color: ${(props) => getRoleColor(props.role)};
-  margin: ${(props) => (props.role === "user" ? "8px" : "0px")};
-  border-radius: ${(props) => (props.role === "user" ? "5px" : "0px")};
+  align-self: ${(props: ChatBubbleProps) =>
+    props.role === "user" ? "flex-end" : "flex-start"};
+  background-color: ${(props: ChatBubbleProps) => getRoleColor(props.role)};
+  margin: ${(props: ChatBubbleProps) =>
+    props.role === "user" ? "8px" : "0px"};
+  border-radius: ${(props: ChatBubbleProps) =>
+    props.role === "user" ? "5px" : "0px"};
   white-space: pre-line;
   font-family: ${fontArray};
 `;
