@@ -20,6 +20,15 @@ import { Message } from "../types";
 //   RotateLeftOutlined,
 // } from "@mui/icons-material";
 // import { IconButton, Typography } from "@mui/material";
+import "@mdxeditor/editor/style.css";
+import {
+  MDXEditor,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin,
+} from "@mdxeditor/editor";
 
 export const Chat = () => {
   const { callApi, addListener, removeListener } = useContext(WebviewContext);
@@ -101,7 +110,20 @@ export const Chat = () => {
           <MessageBubble message={msg} key={index} />
         ))}
       </MessagesContainer>
-      <ChatField input={input} setInput={setInput} handleSend={handleSend} />
+      <MDXEditor
+        markdown={input}
+        plugins={[
+          headingsPlugin(),
+          listsPlugin(),
+          quotePlugin(),
+          thematicBreakPlugin(),
+          toolbarPlugin({
+            toolbarContents: () => <></>,
+          }),
+        ]}
+        onChange={setInput}
+      />
+      {/* <ChatField input={input} setInput={setInput} handleSend={handleSend} /> */}
       {/* <SendButton variant="contained" onClick={handleSend}>
         Send
       </SendButton> */}
