@@ -17,7 +17,7 @@ import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import { useContext } from "react";
 import { WebviewContext } from "../WebviewContext";
 
-export const SettingsPage = () => {
+export const Settings = () => {
   const { callApi } = useContext(WebviewContext);
   const [selectedProvider, setSelectedProvider] = useState("");
   const [apiKey, setApiKey] = useState("");

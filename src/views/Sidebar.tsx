@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "./WebviewContext";
 import { Chat } from "./pages/Chat";
 import { History } from "./pages/History";
-import { SettingsPage } from "./pages/settings";
+import { Settings } from "./pages/settings";
+import { Codebases } from "./pages/Codebases";
 
 type Page = "chat" | "history" | "codebases" | "settings";
 
@@ -26,7 +27,9 @@ export const Sidebar = () => {
   return currentPage == "history" ? (
     <History />
   ) : currentPage == "settings" ? (
-    <SettingsPage />
+    <Settings />
+  ) : currentPage == "codebases" ? (
+    <Codebases />
   ) : (
     <Chat />
   );
