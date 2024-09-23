@@ -5,18 +5,11 @@ import { exists } from "./util";
 
 export class Codebase {
   uri: string;
-  type: "local" | "github" | "gitlab" | "bitbucket" | "sourceforge" | "gitee";
+  type: "local" | "github" | "gitlab" | "bitbucket" | "gitee";
 
   constructor(
     uri: string,
-    type:
-      | "local"
-      | "github"
-      | "gitlab"
-      | "bitbucket"
-      | "sourceforge"
-      | "gitee"
-      | null = null
+    type: "local" | "github" | "gitlab" | "bitbucket" | "gitee" | null = null
   ) {
     if (type === null) {
       if (uri.includes("github.com")) {
@@ -25,8 +18,6 @@ export class Codebase {
         type = "gitlab";
       } else if (uri.includes("bitbucket.io")) {
         type = "bitbucket";
-      } else if (uri.includes("sourceforge.net")) {
-        type = "sourceforge";
       } else if (uri.includes("gitee.com")) {
         type = "gitee";
       } else type = "local";
