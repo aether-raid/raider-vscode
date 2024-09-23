@@ -4,6 +4,9 @@ import {
   Fab,
   Grid,
   IconButton,
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
@@ -15,7 +18,14 @@ import {
   DeleteButton,
   HoverIconButton,
 } from "./Codebases.styles";
-import { Add, ArrowBack, Delete, OpenInNew } from "@mui/icons-material";
+import {
+  Add,
+  ArrowBack,
+  Delete,
+  FolderOpen,
+  OpenInNew,
+  Search,
+} from "@mui/icons-material";
 
 export const Codebases = () => {
   let { callApi } = useContext(WebviewContext);
@@ -113,7 +123,7 @@ export const Codebases = () => {
           </CodebaseCard>
         ))}
       </ul>
-      <Fab
+      {/* <Fab
         size="medium"
         sx={{ position: "absolute", bottom: 16, right: 16 }}
         aria-label="Add"
@@ -124,7 +134,29 @@ export const Codebases = () => {
         }}
       >
         <Add />
-      </Fab>
+      </Fab> */}
+      <SpeedDial
+        FabProps={{ size: "medium" }}
+        ariaLabel="Speed Dial"
+        sx={{ position: "absolute", bottom: 16, right: 16 }}
+        icon={<SpeedDialIcon />}
+      >
+        <SpeedDialAction
+          icon={<FolderOpen />}
+          tooltipTitle="Add Local Folder"
+          onClick={() => {
+            callApi("openAddCodebase");
+            fetchCodebases();
+          }}
+        />
+        <SpeedDialAction
+          icon={<Search />}
+          tooltipTitle="Search Codebases"
+          onClick={() => {
+            callApi("navigateTo", "chat");
+          }}
+        />
+      </SpeedDial>
     </CodebaseContainer>
   );
 };
