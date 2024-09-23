@@ -46,9 +46,15 @@ export type ViewApi = {
   newSession: () => void;
   deleteSession: (sessionId: string) => void;
   openSessionChat: (sessionId: string) => void;
+
+  getCodebases: () => string[];
+  openAddCodebase: () => Promise<void>;
+
   navigateTo: (page: "chat" | "history" | "codebases" | "settings") => void;
 
   renderMarkdown: (text: string) => Promise<string>;
+
+  openInNewWindow: (dir: string) => void;
 };
 
 export type ViewEvents = {

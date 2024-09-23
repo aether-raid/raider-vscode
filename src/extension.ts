@@ -12,6 +12,7 @@ import {
 } from "./viewApi";
 // import fs from "node:fs/promises";
 import { SessionManager } from "./sessionManager";
+import { CodebaseManager } from "./codebaseManager";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
@@ -21,6 +22,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   console.log("raider: ", ctx.storageUri?.fsPath || "no fspath???");
 
   const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
+  const codebaseManager = new CodebaseManager(ctx.storageUri?.fsPath || "");
 
   // const messages = [] as Message[];
 
@@ -93,6 +95,23 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       triggerEvent("showPage", "chat");
       triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
+
+    getCodebases: () => {
+      return codebaseManager.codebases.map((c) => c.uri);
+    },
+
+    openAddCodebase: async () => {
+      const uris = await vscode.window.showOpenDialog({
+        canSelectFiles: false,
+        canSelectFolders: true,
+        canSelectMany: false,
+        openLabel: "Select folder",
+        title: "Select folder",
+      });
+
+      if (uris?.length) codebaseManager.add(uris[0].fsPath);
+    },
+
     navigateTo: (page: "chat" | "history" | "codebases" | "settings") => {
       console.log("navigate to", page, "called");
       triggerEvent("showPage", page);
@@ -102,6 +121,15 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
         "markdown.api.render",
         text
       )) as string;
+    },
+
+    openInNewWindow: (dir: string) => {
+      console.log("raider: open in new window", dir);
+      vscode.commands.executeCommand(
+        "vscode.openFolder",
+        vscode.Uri.file(dir),
+        true
+      );
     },
   };
 
