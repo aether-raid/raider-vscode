@@ -82,7 +82,11 @@ export const Codebases = () => {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: "grey.500", align: "right" }}
+                  sx={{
+                    color: "grey.500",
+                    align: "right",
+                    fontFamily: "Consolas",
+                  }}
                 >
                   {getProjectPath(it)}
                 </Typography>
@@ -110,6 +114,7 @@ export const Codebases = () => {
         ))}
       </ul>
       <Fab
+        size="medium"
         sx={{ position: "absolute", bottom: 16, right: 16 }}
         aria-label="Add"
         color="primary"

@@ -147,6 +147,7 @@ export const History = () => {
         ))}
       </ul>
       <Fab
+        size="medium"
         sx={{ position: "absolute", bottom: 16, right: 16 }}
         aria-label="Add"
         color="primary"
