@@ -3,6 +3,7 @@ import { ViewKey } from "./views";
 import { registerView } from "./registerView";
 import {
   Message,
+  SearchResult,
   ViewApi,
   ViewApiError,
   ViewApiEvent,
@@ -116,6 +117,53 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       codebaseManager.remove(uri);
     },
 
+    async search(query: string): Promise<SearchResult[]> {
+      // TODO: query
+      function shuffle<T>(array: T[]) {
+        let currentIndex = array.length;
+
+        // While there remain elements to shuffle...
+        while (currentIndex != 0) {
+          // Pick a remaining element...
+          let randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex],
+            array[currentIndex],
+          ];
+        }
+      }
+
+      let results = [
+        {
+          type: "github",
+          name: "codebase 1",
+          url: "https://github.com/microsoft/vscode",
+        },
+        {
+          type: "gitlab",
+          name: "codebase 2",
+          url: "https://gitlab.com/gitlab-org/gitlab",
+        },
+        {
+          type: "bitbucket",
+          name: "codebase 3",
+          url: "https://bitbucket.io/hello/world",
+        },
+        {
+          type: "gitee",
+          name: "codebase 4",
+          url: "https://gitee.com/woodywrx/pity",
+        },
+      ] as SearchResult[];
+
+      shuffle(results);
+
+      return results.slice(0, Math.max(1, Math.ceil(Math.random() * 5)));
+    },
+
     navigateTo: (
       page: "chat" | "history" | "codebases" | "settings" | "search"
     ) => {
@@ -136,6 +184,10 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
         vscode.Uri.file(dir),
         true
       );
+    },
+
+    writeToClipboard: (text: string) => {
+      vscode.env.clipboard.writeText(text);
     },
   };
 

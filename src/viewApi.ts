@@ -34,6 +34,12 @@ export type Session = {
   lastUpdated: Date;
 };
 
+export type SearchResult = {
+  type: "github" | "gitlab" | "bitbucket" | "gitee";
+  name: string;
+  url: string;
+};
+
 export type ViewApi = {
   // getFileContents: () => Promise<string>;
   // showExampleViewB: () => void;
@@ -51,6 +57,8 @@ export type ViewApi = {
   openAddCodebase: () => Promise<void>;
   removeCodebase: (uri: string) => void;
 
+  search: (query: string) => Promise<SearchResult[]>;
+
   navigateTo: (
     page: "chat" | "history" | "codebases" | "settings" | "search"
   ) => void;
@@ -58,6 +66,8 @@ export type ViewApi = {
   renderMarkdown: (text: string) => Promise<string>;
 
   openInNewWindow: (dir: string) => void;
+
+  writeToClipboard: (text: string) => void;
 };
 
 export type ViewEvents = {
