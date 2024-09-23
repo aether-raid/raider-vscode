@@ -98,7 +98,8 @@ export const Codebases = () => {
               </HoverIconButton>
               <DeleteButton
                 onClick={() => {
-                  return;
+                  callApi("removeCodebase", it);
+                  fetchCodebases();
                 }}
                 color="error"
               >

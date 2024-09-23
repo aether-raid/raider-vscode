@@ -112,6 +112,10 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       if (uris?.length) codebaseManager.add(uris[0].fsPath);
     },
 
+    removeCodebase(uri: string) {
+      codebaseManager.remove(uri);
+    },
+
     navigateTo: (page: "chat" | "history" | "codebases" | "settings") => {
       console.log("navigate to", page, "called");
       triggerEvent("showPage", page);

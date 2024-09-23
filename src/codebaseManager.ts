@@ -121,6 +121,10 @@ export class CodebaseManager {
     // codebase.initGit();
   }
 
+  remove(uri: string) {
+    this.codebases = this.codebases.filter((it) => it.uri !== uri);
+  }
+
   export(): CodebaseManagerData {
     return {
       codebases: this.codebases.map((it) => it.uri),

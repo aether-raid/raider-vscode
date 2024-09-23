@@ -49,6 +49,7 @@ export type ViewApi = {
 
   getCodebases: () => string[];
   openAddCodebase: () => Promise<void>;
+  removeCodebase: (uri: string) => void;
 
   navigateTo: (page: "chat" | "history" | "codebases" | "settings") => void;
 
