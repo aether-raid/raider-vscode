@@ -153,7 +153,7 @@ export const Codebases = () => {
           icon={<Search />}
           tooltipTitle="Search Codebases"
           onClick={() => {
-            callApi("navigateTo", "chat");
+            callApi("navigateTo", "search");
           }}
         />
       </SpeedDial>

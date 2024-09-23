@@ -116,7 +116,9 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       codebaseManager.remove(uri);
     },
 
-    navigateTo: (page: "chat" | "history" | "codebases" | "settings") => {
+    navigateTo: (
+      page: "chat" | "history" | "codebases" | "settings" | "search"
+    ) => {
       console.log("navigate to", page, "called");
       triggerEvent("showPage", page);
     },
@@ -189,7 +191,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     sessionManager.openSession();
   });
 
-  type Page = "chat" | "history" | "codebases" | "settings";
+  type Page = "chat" | "history" | "codebases" | "settings" | "search";
 
   let pages: Page[] = ["chat", "history", "codebases", "settings"];
 

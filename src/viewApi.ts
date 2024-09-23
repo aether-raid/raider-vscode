@@ -51,7 +51,9 @@ export type ViewApi = {
   openAddCodebase: () => Promise<void>;
   removeCodebase: (uri: string) => void;
 
-  navigateTo: (page: "chat" | "history" | "codebases" | "settings") => void;
+  navigateTo: (
+    page: "chat" | "history" | "codebases" | "settings" | "search"
+  ) => void;
 
   renderMarkdown: (text: string) => Promise<string>;
 
@@ -65,5 +67,7 @@ export type ViewEvents = {
   // showSettingsPage: () => void;
   sendMessages: (messages: Message[]) => void;
   sendHistory: (sessions: Session[]) => void;
-  showPage: (page: "chat" | "history" | "codebases" | "settings") => void;
+  showPage: (
+    page: "chat" | "history" | "codebases" | "settings" | "search"
+  ) => void;
 };
