@@ -2,13 +2,7 @@ import { v4 as uuid4 } from "uuid";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { Message } from "./viewApi";
-
-async function exists(path: string): Promise<boolean> {
-  return fs
-    .access(path)
-    .then(() => true)
-    .catch(() => false);
-}
+import { exists } from "./util";
 
 export class SessionNotFoundError extends Error {
   sessionId: string;
@@ -150,41 +144,29 @@ export class SessionManager {
     this.jsonPath = path.join(this.storagePath, "sessions.json");
 
     exists(this.storagePath).then(async (flag) => {
-      if (flag) {
-        let flag2 = await exists(this.jsonPath);
-
-        if (flag2) {
-          // file exists
-          let data = await fs.readFile(this.jsonPath, "utf8");
-          let sessions = JSON.parse(data) as SessionManagerData;
-          this.sessions = sessions.sessions
-            .map((it) => new Session(it))
-            .reduce(
-              (prev, it) => ({
-                ...prev,
-                [it.id]: it,
-              }),
-              {} as { [index: string]: Session }
-            );
-          this.currentSession = sessions.currentSession;
-          this.storagePath = sessions.storagePath;
-          this.jsonPath = sessions.jsonPath;
-        } else {
-          // files does not exist, but folder does
-          await fs.writeFile(
-            this.jsonPath,
-            JSON.stringify({
-              sessions: [],
-              currentSession: null,
-              storagePath: this.storagePath,
-              jsonPath: this.jsonPath,
-            }),
-            "utf8"
-          );
-        }
-      } else {
-        // folder itself does not exist
+      if (!flag) {
         await fs.mkdir(this.storagePath);
+      }
+      let flag2 = await exists(this.jsonPath);
+
+      if (flag2) {
+        // file exists
+        let data = await fs.readFile(this.jsonPath, "utf8");
+        let sessions = JSON.parse(data) as SessionManagerData;
+        this.sessions = sessions.sessions
+          .map((it) => new Session(it))
+          .reduce(
+            (prev, it) => ({
+              ...prev,
+              [it.id]: it,
+            }),
+            {} as { [index: string]: Session }
+          );
+        this.currentSession = sessions.currentSession;
+        this.storagePath = sessions.storagePath;
+        this.jsonPath = sessions.jsonPath;
+      } else {
+        // file does not exist
         await fs.writeFile(
           this.jsonPath,
           JSON.stringify({
