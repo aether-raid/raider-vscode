@@ -7,6 +7,7 @@ import {
   SpeedDialAction,
   SpeedDialIcon,
   Typography,
+  TextField,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "../WebviewContext";
@@ -17,52 +18,49 @@ import {
   DeleteButton,
   HoverIconButton,
 } from "./Codebases.styles";
-import {
-  ArrowBack,
-  Delete,
-  FolderOpen,
-  OpenInNew,
-  Search,
-} from "@mui/icons-material";
+import { ArrowBack, Delete, FolderOpen, OpenInNew, Search, ContentCopy, GitHub } from "@mui/icons-material";
+import { GitlabIcon } from './icons'; // Replace with correct GitLab icon
 
 export const Codebases = () => {
-  let { callApi } = useContext(WebviewContext);
+  const { callApi } = useContext(WebviewContext);
 
   const [codebases, setCodebases] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredCodebases, setFilteredCodebases] = useState<string[]>([]);
 
-  const fetchCodebases = async () => {
-    setCodebases(await callApi("getCodebases"));
+  // Mock function to get the repository type
+  const getRepositoryType = (codebase: string) => {
+    return codebase.includes("github") ? "github" : "gitlab";
+  };
+
+  // Mock function to get the project name
+  const getProjectName = (codebase: string) => {
+    return codebase.split("/").pop(); // Extracts the last part of the path
+  };
+
+  // Mock function to get the project path
+  const getProjectPath = (codebase: string) => {
+    return codebase;
+  };
+
+  // Fetch codebases (replace this with real API call if available)
+  const fetchCodebases = () => {
+    setCodebases([
+      "https://github.com/sampleproject1",
+      "https://gitlab.com/sampleproject2",
+    ]);
   };
 
   useEffect(() => {
     fetchCodebases();
-
-    let interval = setInterval(() => {
-      fetchCodebases();
-    }, 500);
-
-    return () => {
-      clearInterval(interval);
-    };
   }, []);
 
-  function getProjectName(codebase: string): string {
-    let splits = codebase.split(/\/|\\/g);
-    return splits[splits.length - 1];
-  }
-
-  function getProjectPath(codebase: string): string {
-    let splits = codebase.split(/\/|\\/g);
-    let path = splits.join("/");
-
-    // path = path.replace(/[a-zA-Z]+:\/Users\/[^/]+/gi, "~/");
-
-    path = path
-      .replace(/[a-zA-Z]+:\/[uU]sers\/[^/]+\//gi, "~/")
-      .replace(/\/home\/[^/]+\//gi, "~/");
-
-    return path;
-  }
+  useEffect(() => {
+    const filtered = codebases.filter((codebase) =>
+      codebase.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCodebases(filtered);
+  }, [codebases, searchTerm]);
 
   return (
     <CodebaseContainer>
@@ -73,66 +71,73 @@ export const Codebases = () => {
         <Typography variant="h6" component="div">
           Reference Codebases
         </Typography>
+        <TextField
+          label="Search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ marginLeft: 2 }}
+        />
       </Grid>
       <ul>
-        {codebases.map((it) => (
-          <CodebaseCard key={it}>
-            <CardContent>
-              <Box>
-                <Typography
-                  gutterBottom
-                  variant="h4"
-                  component="div"
-                  sx={{ fontSize: "15px" }}
-                >
-                  {getProjectName(it)}
-                  {/* {it} */}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "grey.500",
-                    align: "right",
-                    fontFamily: "Consolas",
+        {filteredCodebases.map((it) => {
+          const repositoryType = getRepositoryType(it);
+          return (
+            <CodebaseCard key={it}>
+              <CardContent>
+                <Box>
+                  <Typography
+                    gutterBottom
+                    variant="h4"
+                    component="div"
+                    sx={{ fontSize: "15px" }}
+                  >
+                    {getProjectName(it)}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "grey.500",
+                      textAlign: "right",
+                      fontFamily: "Consolas",
+                    }}
+                  >
+                    {getProjectPath(it)}
+                  </Typography>
+                </Box>
+              </CardContent>
+              <CodebaseCardMenu>
+                <HoverIconButton
+                  onClick={() => {
+                    callApi("openInNewWindow", it);
                   }}
                 >
-                  {getProjectPath(it)}
-                </Typography>
-              </Box>
-            </CardContent>
-            <CodebaseCardMenu>
-              <HoverIconButton
-                onClick={() => {
-                  callApi("openInNewWindow", it);
-                }}
-              >
-                <OpenInNew />
-              </HoverIconButton>
-              <DeleteButton
-                onClick={() => {
-                  callApi("removeCodebase", it);
-                  fetchCodebases();
-                }}
-                color="error"
-              >
-                <Delete />
-              </DeleteButton>
-            </CodebaseCardMenu>
-          </CodebaseCard>
-        ))}
+                  <OpenInNew />
+                </HoverIconButton>
+                <HoverIconButton
+                  onClick={() => {
+                    navigator.clipboard.writeText(it);
+                  }}
+                >
+                  <ContentCopy />
+                </HoverIconButton>
+                {/* Render GitHub or GitLab icon here */}
+                <Box display="flex" justifyContent="center" mt={1}>
+                  {repositoryType === "github" ? <GitHub /> : <GitlabIcon />}
+                </Box>
+                <DeleteButton
+                  onClick={() => {
+                    callApi("removeCodebase", it);
+                    fetchCodebases();
+                  }}
+                  color="error"
+                >
+                  <Delete />
+                </DeleteButton>
+              </CodebaseCardMenu>
+            </CodebaseCard>
+          );
+        })}
       </ul>
-      {/* <Fab
-        size="medium"
-        sx={{ position: "absolute", bottom: 16, right: 16 }}
-        aria-label="Add"
-        color="primary"
-        onClick={() => {
-          callApi("openAddCodebase");
-          fetchCodebases();
-        }}
-      >
-        <Add />
-      </Fab> */}
       <SpeedDial
         FabProps={{ size: "medium" }}
         ariaLabel="Speed Dial"
