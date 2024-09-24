@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import {
   HoverIconButton,
+  RemoteIcon,
   SearchContainer,
   SearchField,
   SearchResultCard,
@@ -45,6 +46,11 @@ const SearchResult = ({ result }: { result: Codebase }) => {
       onMouseOut={() => setCopy(false)}
     >
       <SearchResultCardActionArea onClick={handleCopy}>
+        {/* <IconButton> */}
+        {/* <Box sx={{ display: "flex", alignItems: "center" }}> */}
+        <RemoteIcon type={result.type} height={100} width={100} />
+        {/* </Box> */}
+        {/* </IconButton> */}
         <CardContent>
           <Box>
             <Typography

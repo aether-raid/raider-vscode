@@ -13,6 +13,8 @@ import {
 import { ThemeButton, fontArray } from "../theme/theme";
 import { Search } from "@mui/icons-material";
 
+import githubLogo from "../assets/github-logo.svg";
+
 export const SearchContainer = styled(Box)`
   display: flex;
   flex-direction: column;
@@ -144,3 +146,28 @@ export const HoverIconButton = styled(IconButton)`
   }
   padding-bottom: 10px;
 `;
+
+export const RemoteIcon = ({
+  type,
+  width,
+  height,
+}: {
+  type: "github" | "gitlab" | "bitbucket" | "gitee";
+  width: number;
+  height: number;
+}) => {
+  if (type === "github") {
+  }
+
+  let iconUrl =
+    type === "github"
+      ? "../assets/github-logo.svg" // "https://cdn0.iconfinder.com/data/icons/shift-logotypes/32/Github-512.png"
+      : type === "gitlab"
+      ? "/static/gitlab-logo.svg" // "https://www.cloudservices.store/site/wp-content/uploads/2020/10/logo-extra-whitespace.png"
+      : type === "bitbucket"
+      ? "https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/44_Bitbucket_logo_logos-512.png"
+      : type === "gitee"
+      ? "https://avatars.githubusercontent.com/u/95162452?v=4"
+      : "";
+  return <img src={iconUrl} width={width} height={height} />;
+};
