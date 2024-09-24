@@ -25,6 +25,8 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
   const codebaseManager = new CodebaseManager(ctx.storageUri?.fsPath || "");
 
+  let currentPage = "chat";
+
   // const messages = [] as Message[];
 
   // const currentSessionId = uuid
@@ -43,29 +45,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   };
 
   const api: ViewApi = {
-    // getFileContents: async () => {
-    //   const uris = await vscode.window.showOpenDialog({
-    //     canSelectFiles: true,
-    //     canSelectFolders: false,
-    //     canSelectMany: false,
-    //     openLabel: "Select file",
-    //     title: "Select file to read",
-    //   });
-
-    //   if (!uris?.length) {
-    //     return "";
-    //   }
-
-    //   const contents = await fs.readFile(uris[0].fsPath, "utf-8");
-    //   return contents;
-    // },
-    // showExampleViewB: () => {
-    //   connectedViews?.raiderTerminal?.show?.(true);
-    //   vscode.commands.executeCommand(`raiderTerminal.focus`);
-    // },
-    // sendMessageToExampleB: (msg: string) => {
-    //   triggerEvent("exampleBMessage", msg);
-    // },
     sendMessage: (msg: Message) => {
       sessionManager.getCurrentSession().message(msg.role, msg.content);
     },
@@ -75,15 +54,14 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     getSessions: () => {
       return sessionManager.export();
     },
-    // resetMessageHistory: () => {
-    //   messages.length = 0;
-    // },
-    // getResetCommand: () => {
-    //   console.log("reset");
-    // },
+    resetMessageHistory: () => {
+      sessionManager.getCurrentSession().reset();
+      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+    },
     newSession: () => {
       console.log("new session???");
       triggerEvent("showPage", "chat");
+      currentPage = "chat";
       sessionManager.openSession();
     },
     deleteSession: (sessionId: string) => {
@@ -94,6 +72,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     openSessionChat: async (sessionId: string) => {
       sessionManager.openSession(sessionId);
       triggerEvent("showPage", "chat");
+      currentPage = "chat";
       triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
 
@@ -169,6 +148,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     ) => {
       console.log("navigate to", page, "called");
       triggerEvent("showPage", page);
+      currentPage = page;
     },
     renderMarkdown: async (text: string) => {
       return (await vscode.commands.executeCommand(
@@ -232,14 +212,15 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   registerAndConnectView("raiderChat");
   // registerAndConnectView("raiderTerminal");
 
-  vscode.commands.registerCommand("raider.reset", () => {
-    sessionManager.getCurrentSession().reset();
-    console.log("raider.reset called");
-    triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
-  });
+  // vscode.commands.registerCommand("raider.reset", () => {
+  //   sessionManager.getCurrentSession().reset();
+  //   console.log("raider.reset called");
+  //   triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+  // });
 
   vscode.commands.registerCommand("raider.new", () => {
     triggerEvent("showPage", "chat");
+    currentPage = "chat";
     sessionManager.openSession();
   });
 
@@ -253,26 +234,9 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       console.log(`raider.${page} called`);
       console.log(page, "cooked");
       triggerEvent("showPage", page);
+      currentPage = page;
     });
   });
-
-  // vscode.commands.registerCommand("raider.chat", () => {
-  //   // TODO
-  //   console.log("raider.chat called");
-  //   triggerEvent("showChatPage");
-  // });
-
-  // vscode.commands.registerCommand("raider.history", () => {
-  //   // TODO
-  //   console.log("raider.history called");
-  //   triggerEvent("showHistoryPage");
-  // });
-
-  // vscode.commands.registerCommand("raider.settings", () => {
-  //   // TODO
-  //   console.log("raider.settings called");
-  //   triggerEvent("showSettingsPage");
-  // });
 };
 
 export const deactivate = () => {
