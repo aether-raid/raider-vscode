@@ -59,7 +59,7 @@ const SearchResult = ({ result }: { result: Codebase }) => {
               variant="body2"
               sx={{ color: "grey.500", align: "right" }}
             >
-              {result.url}
+              {result.url.replace(/https?:\/\//i, "")}
             </Typography>
           </Box>
         </CardContent>
