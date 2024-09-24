@@ -37,6 +37,14 @@ module.exports = (env, { mode }) => {
           },
           exclude: /node_modules/u,
         },
+        {
+          test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+          exclude: /node_modules/u,
+          type: "asset/resource",
+          use: {
+            loader: "file-loader",
+          },
+        },
       ],
     },
     devServer: {
