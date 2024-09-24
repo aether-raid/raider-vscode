@@ -1,16 +1,13 @@
 import styled from "@emotion/styled";
 import {
-  Button,
   Box,
-  Typography,
-  TextField,
   InputAdornment,
   OutlinedInput,
   IconButton,
   Card,
   CardActionArea,
 } from "@mui/material";
-import { ThemeButton, fontArray } from "../theme/theme";
+import { fontArray } from "../theme/theme";
 import { Search } from "@mui/icons-material";
 
 export const SearchContainer = styled(Box)`
@@ -74,7 +71,7 @@ export const SearchField = ({
   return (
     <SearchInputContainer>
       <SearchInput
-        placeholder="Search..."
+        placeholder="Search now..."
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={onEnter}
@@ -144,3 +141,9 @@ export const HoverIconButton = styled(IconButton)`
   }
   padding-bottom: 10px;
 `;
+
+import { GitHub } from "@mui/icons-material";
+import { FaGitlab } from "react-icons/fa"; // Import GitLab icon from react-icons
+
+export const GithubIcon = GitHub;
+export const GitlabIcon = FaGitlab; // Use GitLab from react-icons
