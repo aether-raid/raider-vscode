@@ -47,13 +47,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "raider.reset",
-        "title": "Reset History",
-        "category": "Raider",
-        "icon": "$(refresh)",
-        "group": "Raider"
-      },
-      {
         "command": "raider.new",
         "title": "New Session",
         "category": "Raider",
@@ -93,11 +86,6 @@
       "view/title": [
         {
           "command": "raider.new",
-          "group": "navigation@1",
-          "when": "view == raiderChat"
-        },
-        {
-          "command": "raider.reset",
           "group": "navigation@1",
           "when": "view == raiderChat"
         },

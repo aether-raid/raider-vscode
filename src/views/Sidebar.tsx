@@ -12,7 +12,7 @@ export const Sidebar = () => {
   const { addListener, removeListener } = useContext(WebviewContext);
 
   // const [isHistoryPage, setHistoryPage] = useState(false);
-  const [currentPage, setCurrentPage] = useState<Page>("search");
+  const [currentPage, setCurrentPage] = useState<Page>("chat");
 
   useEffect(() => {
     const showPage = (page: Page) => {

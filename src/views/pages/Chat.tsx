@@ -14,6 +14,8 @@ import {
   // SendButton,
 } from "./Chat.styles";
 import { Message } from "../types";
+import { Fab } from "@mui/material";
+import { Replay, RotateLeft, RotateLeftOutlined } from "@mui/icons-material";
 // import {
 //   ChatBubbleOutlineOutlined,
 //   KeyboardDoubleArrowRight,
@@ -51,16 +53,16 @@ export const Chat = () => {
   //   callApi("resetMessageHistory");
   //   setMessages([]);
   // };
+  const fetchMessages = async () => {
+    setMessages(await callApi("getMessages"));
+  };
+
+  const getMessagesSent = (messages: Message[]) => {
+    setMessages(messages);
+  };
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      setMessages(await callApi("getMessages"));
-    };
     fetchMessages();
-
-    const getMessagesSent = (messages: Message[]) => {
-      setMessages(messages);
-    };
 
     addListener("sendMessages", getMessagesSent);
 
@@ -102,43 +104,18 @@ export const Chat = () => {
         ))}
       </MessagesContainer>
       <ChatField input={input} setInput={setInput} handleSend={handleSend} />
-      {/* <SendButton variant="contained" onClick={handleSend}>
-        Send
-      </SendButton> */}
+      <Fab
+        size="small"
+        sx={{ position: "absolute", top: "16px", right: "16px" }}
+        aria-label="reset"
+        color="primary"
+        onClick={() => {
+          callApi("resetMessageHistory");
+          fetchMessages();
+        }}
+      >
+        <RotateLeftOutlined />
+      </Fab>
     </ChatContainer>
   );
 };
-
-/* export const ExampleViewA = () => {
-  const { callApi } = useContext(WebviewContext);
-  const [bMessage, setBMessage] = useState<string>("");
-
-  return (
-    <div>
-      <div style={{ display: "flex" }}>
-        <button
-          onClick={() => {
-            callApi("showExampleViewB");
-          }}
-        >
-          Show Example View B
-        </button>
-      </div>
-      <div style={{ display: "flex", marginTop: 10 }}>
-        <input
-          type="text"
-          value={bMessage}
-          onChange={(e) => setBMessage(e.target.value)}
-        />
-        <button
-          onClick={() => {
-            callApi("sendMessageToExampleB", bMessage);
-            setBMessage("");
-          }}
-        >
-          Send to Example View B
-        </button>
-      </div>
-    </div>
-  );
-}; */
