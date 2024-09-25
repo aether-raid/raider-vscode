@@ -14,6 +14,8 @@ import {
 // import fs from "node:fs/promises";
 import { SessionManager } from "./sessionManager";
 import { CodebaseManager } from "./codebaseManager";
+import { startPythonServer } from "./pythonServer";
+import path from "path";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
@@ -26,6 +28,18 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   const codebaseManager = new CodebaseManager(ctx.storageUri?.fsPath || "");
 
   let currentPage = "chat";
+
+  const pythonConfig = vscode.workspace.getConfiguration("python");
+  const pythonPath = pythonConfig.get<string>("pythonPath");
+
+  if (pythonPath) {
+    const pythonServer = startPythonServer(
+      pythonPath,
+      path.join(ctx.extensionPath, "dummy-server")
+    );
+  }
+
+  // let pythonServer = startPythonServer();
 
   // const messages = [] as Message[];
 
@@ -236,6 +250,12 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       triggerEvent("showPage", page);
       currentPage = page;
     });
+  });
+
+  ctx.subscriptions.push({
+    dispose: () => {
+      pythonServer.kill();
+    },
   });
 };
 
