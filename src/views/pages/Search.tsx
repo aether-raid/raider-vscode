@@ -1,12 +1,6 @@
 import { useContext, useState } from "react";
 import { WebviewContext } from "../WebviewContext";
-import {
-  Box,
-  CardContent,
-  Grow,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { Box, CardContent, Grow, IconButton, Typography } from "@mui/material";
 import {
   SearchContainer,
   SearchField,
@@ -14,9 +8,9 @@ import {
   SearchResultCardActionArea,
   SearchResultCardMenu,
   SearchResultContainer,
+  getIcon,
 } from "./Search.styles";
-import { Check, ContentCopy, GitHub } from "@mui/icons-material";
-import { GitlabIcon } from "./icons";
+import { Check, ContentCopy } from "@mui/icons-material";
 
 type Codebase = {
   type: "github" | "gitlab" | "bitbucket" | "gitee";
@@ -38,17 +32,6 @@ const SearchResult = ({ result }: { result: Codebase }) => {
     }, 2000);
   };
 
-  const getIcon = () => {
-    switch (result.type) {
-      case "github":
-        return <GitHub />;
-      case "gitlab":
-        return <GitlabIcon />;
-      default:
-        return null; // Or a placeholder icon for unsupported types
-    }
-  };
-
   return (
     <SearchResultCard
       onMouseOver={() => setCopy(true)}
@@ -57,17 +40,33 @@ const SearchResult = ({ result }: { result: Codebase }) => {
       <SearchResultCardActionArea onClick={handleCopy}>
         <CardContent>
           <Box>
-            <Typography gutterBottom variant="h4" component="div" sx={{ fontSize: "15px" }}>
+            <Typography
+              gutterBottom
+              variant="h4"
+              component="div"
+              sx={{ fontSize: "15px" }}
+            >
+              {getIcon(result.type) && (
+                <IconButton size="small">{getIcon(result.type)}</IconButton>
+              )}{" "}
               {result.name}
             </Typography>
-            <Typography variant="body2" sx={{ color: "grey.500", align: "right" }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "grey.500", align: "right" }}
+            >
               {result.url.replace(/https?:\/\//i, "")}
             </Typography>
           </Box>
         </CardContent>
         <SearchResultCardMenu>
           {showCopy && (
-            <IconButton size="large" sx={{ marginBottom: "auto", marginTop: "auto" }} onClick={handleCopy} color={copied ? "success" : "default"}>
+            <IconButton
+              size="large"
+              sx={{ marginBottom: "auto", marginTop: "auto" }}
+              onClick={handleCopy}
+              color={copied ? "success" : "default"}
+            >
               {!copied ? (
                 <Grow in={!copied}>
                   <ContentCopy />
@@ -79,7 +78,7 @@ const SearchResult = ({ result }: { result: Codebase }) => {
               )}
             </IconButton>
           )}
-          {getIcon() && <IconButton size="small">{getIcon()}</IconButton>}
+          {/* {getIcon() && <IconButton size="small">{getIcon()}</IconButton>} */}
         </SearchResultCardMenu>
       </SearchResultCardActionArea>
     </SearchResultCard>
@@ -99,7 +98,11 @@ export const Search = () => {
 
   return (
     <SearchContainer>
-      <SearchField input={searchText} setInput={setSearchText} handleSearch={search} />
+      <SearchField
+        input={searchText}
+        setInput={setSearchText}
+        handleSearch={search}
+      />
       <SearchResultContainer>
         {searchResults.map((result, index) => (
           <SearchResult key={index} result={result} />

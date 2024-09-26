@@ -10,6 +10,11 @@ import {
 import { fontArray } from "../theme/theme";
 import { Search } from "@mui/icons-material";
 
+import { GitHub } from "@mui/icons-material";
+// Import GitLab, Bitbucket, Gitee icons from react-icons
+import { FaGitlab, FaBitbucket } from "react-icons/fa";
+import { SiGitee } from "react-icons/si";
+
 export const SearchContainer = styled(Box)`
   display: flex;
   flex-direction: column;
@@ -142,8 +147,22 @@ export const HoverIconButton = styled(IconButton)`
   padding-bottom: 10px;
 `;
 
-import { GitHub } from "@mui/icons-material";
-import { FaGitlab } from "react-icons/fa"; // Import GitLab icon from react-icons
-
 export const GithubIcon = GitHub;
 export const GitlabIcon = FaGitlab; // Use GitLab from react-icons
+export const BitbucketIcon = FaBitbucket; // Use Bitbucket from react-icons
+export const GiteeIcon = SiGitee; // Use Gitee from react-icons
+
+export const getIcon = (type: string) => {
+  switch (type) {
+    case "github":
+      return <GithubIcon />;
+    case "gitlab":
+      return <GitlabIcon />;
+    case "bitbucket":
+      return <BitbucketIcon />;
+    case "gitee":
+      return <GiteeIcon />;
+    default:
+      return null;
+  }
+};
