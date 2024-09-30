@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { exists } from "./util";
+import { Backend } from "./backendApi";
 // import cp from "child_process";
 
 export class Codebase {
@@ -70,11 +71,15 @@ export class CodebaseManager {
   storagePath: string;
   jsonPath: string;
 
-  constructor(storagePath: string) {
+  backendInstance: Backend;
+
+  constructor(storagePath: string, backendInstance: Backend) {
     this.codebases = [];
 
     this.storagePath = path.join(storagePath, ".raider");
     this.jsonPath = path.join(this.storagePath, "codebases.json");
+
+    this.backendInstance = backendInstance;
 
     exists(this.storagePath).then(async (flag) => {
       if (!flag) {
@@ -106,8 +111,9 @@ export class CodebaseManager {
     });
   }
 
-  add(uri: string) {
+  async add(uri: string) {
     let codebase = new LocalCodebase(uri);
+    await this.backendInstance.initExternalRepo(codebase.uri);
     this.codebases.push(codebase);
     // codebase.initGit();
   }

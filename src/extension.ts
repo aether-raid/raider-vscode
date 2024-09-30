@@ -14,6 +14,7 @@ import {
 // import fs from "node:fs/promises";
 import { SessionManager } from "./sessionManager";
 import { CodebaseManager } from "./codebaseManager";
+import { Backend } from "./backendApi";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
@@ -22,8 +23,13 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   console.log("raider: ", ctx.storageUri?.path || "no path???");
   console.log("raider: ", ctx.storageUri?.fsPath || "no fspath???");
 
+  const backend = new Backend(
+    vscode.workspace.workspaceFolders
+      ? vscode.workspace.workspaceFolders[0].uri.fsPath
+      : ""
+  );
   const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
-  const codebaseManager = new CodebaseManager(ctx.storageUri?.fsPath || "");
+  const codebaseManager = new CodebaseManager(ctx.storageUri?.fsPath || "", backend);
 
   let currentPage = "chat";
 
