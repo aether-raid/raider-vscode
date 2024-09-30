@@ -23,6 +23,8 @@ module.exports = (env, { mode }) => {
     externals: {
       vs: "vs",
       vscode: "commonjs vscode",
+      bufferutil: "bufferutil",
+      "utf-8-validate": "utf-8-validate",
     },
     resolve: {
       roots: [__dirname],
