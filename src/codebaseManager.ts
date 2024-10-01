@@ -76,39 +76,43 @@ export class CodebaseManager {
   constructor(storagePath: string, backendInstance: Backend) {
     this.codebases = [];
 
-    this.storagePath = path.join(storagePath, ".raider");
+    this.storagePath = storagePath; // path.join(storagePath, ".raider");
     this.jsonPath = path.join(this.storagePath, "codebases.json");
 
     this.backendInstance = backendInstance;
 
-    exists(this.storagePath).then(async (flag) => {
-      if (!flag) {
-        await fs.mkdir(this.storagePath);
-      }
+    // this.loadFromStorage();
+  }
 
-      let flag2 = await exists(this.jsonPath);
+  async loadFromStorage() {
+    let flag = await exists(this.storagePath);
 
-      if (flag2) {
-        // file exists
-        let data = await fs.readFile(this.jsonPath, "utf8");
-        let codebases = JSON.parse(data) as CodebaseManagerData;
-        this.codebases = codebases.codebases.map(
-          (uri: string) => new LocalCodebase(uri)
-        );
-        this.storagePath = codebases.storagePath;
-        this.jsonPath = codebases.jsonPath;
-      } else {
-        await fs.writeFile(
-          this.jsonPath,
-          JSON.stringify({
-            codebases: [] as string[],
-            storagePath: this.storagePath,
-            jsonPath: this.jsonPath,
-          } as CodebaseManagerData),
-          "utf8"
-        );
-      }
-    });
+    if (!flag) {
+      await fs.mkdir(this.storagePath);
+    }
+
+    let flag2 = await exists(this.jsonPath);
+
+    if (flag2) {
+      // file exists
+      let data = await fs.readFile(this.jsonPath, "utf8");
+      let codebases = JSON.parse(data) as CodebaseManagerData;
+      this.codebases = codebases.codebases.map(
+        (uri: string) => new LocalCodebase(uri)
+      );
+      this.storagePath = codebases.storagePath;
+      this.jsonPath = codebases.jsonPath;
+    } else {
+      await fs.writeFile(
+        this.jsonPath,
+        JSON.stringify({
+          codebases: [] as string[],
+          storagePath: this.storagePath,
+          jsonPath: this.jsonPath,
+        } as CodebaseManagerData),
+        "utf8"
+      );
+    }
   }
 
   async add(uri: string) {
@@ -128,6 +132,12 @@ export class CodebaseManager {
       storagePath: this.storagePath,
       jsonPath: this.jsonPath,
     };
+  }
+
+  async getAllCodebases(): Promise<string[]> {
+    let codebases = await this.backendInstance.getExternalRepoAgents();
+    // this.codebases =
+    return codebases;
   }
 
   async save(): Promise<boolean> {

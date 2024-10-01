@@ -52,10 +52,12 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     }
   );
   const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
+  await sessionManager.loadFromStorage();
   const codebaseManager = new CodebaseManager(
     ctx.storageUri?.fsPath || "",
     backend
   );
+  await codebaseManager.loadFromStorage();
 
   const api: ViewApi = {
     restartServer: () => {
@@ -92,8 +94,8 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
 
-    getCodebases: () => {
-      return codebaseManager.codebases.map((c) => c.uri);
+    getCodebases: async () => {
+      return await codebaseManager.getAllCodebases();
     },
 
     openAddCodebase: async () => {

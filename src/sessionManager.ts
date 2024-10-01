@@ -63,7 +63,7 @@ export class Session {
   }
 
   static async setStorage(dir: string): Promise<boolean> {
-    dir = path.join(dir, ".raider");
+    // dir = path.join(dir, ".raider");
     let flag = await exists(dir);
     if (!flag) {
       await fs.mkdir(dir);
@@ -140,45 +140,47 @@ export class SessionManager {
   jsonPath: string;
 
   constructor(storagePath: string) {
-    this.storagePath = path.join(storagePath, ".raider");
+    this.storagePath = storagePath; //path.join(storagePath, ".raider");
     this.jsonPath = path.join(this.storagePath, "sessions.json");
+  }
 
-    exists(this.storagePath).then(async (flag) => {
-      if (!flag) {
-        await fs.mkdir(this.storagePath);
-      }
-      let flag2 = await exists(this.jsonPath);
+  async loadFromStorage() {
+    let flag = await exists(this.storagePath);
 
-      if (flag2) {
-        // file exists
-        let data = await fs.readFile(this.jsonPath, "utf8");
-        let sessions = JSON.parse(data) as SessionManagerData;
-        this.sessions = sessions.sessions
-          .map((it) => new Session(it))
-          .reduce(
-            (prev, it) => ({
-              ...prev,
-              [it.id]: it,
-            }),
-            {} as { [index: string]: Session }
-          );
-        this.currentSession = sessions.currentSession;
-        this.storagePath = sessions.storagePath;
-        this.jsonPath = sessions.jsonPath;
-      } else {
-        // file does not exist
-        await fs.writeFile(
-          this.jsonPath,
-          JSON.stringify({
-            sessions: [],
-            currentSession: null,
-            storagePath: this.storagePath,
-            jsonPath: this.jsonPath,
+    if (!flag) {
+      await fs.mkdir(this.storagePath);
+    }
+    let flag2 = await exists(this.jsonPath);
+
+    if (flag2) {
+      // file exists
+      let data = await fs.readFile(this.jsonPath, "utf8");
+      let sessions = JSON.parse(data) as SessionManagerData;
+      this.sessions = sessions.sessions
+        .map((it) => new Session(it))
+        .reduce(
+          (prev, it) => ({
+            ...prev,
+            [it.id]: it,
           }),
-          "utf8"
+          {} as { [index: string]: Session }
         );
-      }
-    });
+      this.currentSession = sessions.currentSession;
+      this.storagePath = sessions.storagePath;
+      this.jsonPath = sessions.jsonPath;
+    } else {
+      // file does not exist
+      await fs.writeFile(
+        this.jsonPath,
+        JSON.stringify({
+          sessions: [],
+          currentSession: null,
+          storagePath: this.storagePath,
+          jsonPath: this.jsonPath,
+        }),
+        "utf8"
+      );
+    }
   }
 
   getSessionIds(): string[] {

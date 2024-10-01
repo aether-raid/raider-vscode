@@ -54,7 +54,7 @@ export type ViewApi = {
   deleteSession: (sessionId: string) => void;
   openSessionChat: (sessionId: string) => void;
 
-  getCodebases: () => string[];
+  getCodebases: () => Promise<string[]>;
   openAddCodebase: () => Promise<void>;
   removeCodebase: (uri: string) => void;
 
