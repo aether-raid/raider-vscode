@@ -1,6 +1,5 @@
 import WebSocket from "ws";
 import { v4 as uuidv4 } from "uuid";
-import { ThumbUpSharp } from "@mui/icons-material";
 
 export type InitExternalRepoParams = {
   repo_dir: string;
@@ -45,32 +44,40 @@ export class Backend {
 
   serverPort: number = 10000;
 
-  expectingResponse: boolean;
-  responding: boolean;
+  expectingResponse: boolean = false;
+  responding: boolean = false;
 
-  currentGeneration: string;
+  currentGeneration: string = "";
 
-  currentPromise: Promise<string> | null;
+  currentPromise: Promise<string> | null = null;
+
+  onCloseAction: () => void = () => {};
 
   serverRoute(): string {
     return `ws://localhost:${this.serverPort}/ws/${this.sessionId}`;
   }
 
-  ws: WebSocket;
+  ws: WebSocket | null = null;
 
-  constructor(workspaceDir: string) {
+  constructor(workspaceDir: string, onCloseAction = () => {}) {
     this.sessionId = uuidv4();
     this.workspaceDir = workspaceDir;
+    this.start();
+    this.onCloseAction = onCloseAction;
+  }
+
+  start() {
+    this.isOpen = false;
+    this.expectingResponse = false;
+    this.responding = false;
+    this.currentGeneration = "";
+    this.currentPromise = null;
+
     this.ws = new WebSocket(this.serverRoute());
 
     this.ws.on("open", this.onOpen);
     this.ws.on("close", this.onClose);
     this.ws.on("message", this.processMessage);
-
-    this.expectingResponse = false;
-    this.responding = false;
-    this.currentGeneration = "";
-    this.currentPromise = null;
   }
 
   createPromise(): Promise<string> {
@@ -98,6 +105,7 @@ export class Backend {
       | RunSubtaskParams
       | undefined = undefined
   ): Promise<string> {
+    if (this.ws === null) return "";
     await this.currentPromise;
     this.ws.send(
       JSON.stringify({
@@ -114,7 +122,7 @@ export class Backend {
   async initExternalRepo(
     repoDir: string,
     modelName: string = "azure/gpt4o",
-    timeout: number = 1000
+    timeout: number = 20
   ) {
     await this.sendMsg("init_external_repo_agent", {
       repo_dir: repoDir,
@@ -161,6 +169,7 @@ export class Backend {
   onClose() {
     console.log("Disconnected from server");
     this.isOpen = false;
+    this.onCloseAction();
   }
 
   async open() {

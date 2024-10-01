@@ -6,7 +6,13 @@ import { Settings } from "./pages/settings";
 import { Codebases } from "./pages/Codebases";
 import { Search } from "./pages/Search";
 
-type Page = "chat" | "history" | "codebases" | "settings" | "search";
+type Page =
+  | "chat"
+  | "history"
+  | "codebases"
+  | "settings"
+  | "search"
+  | "disconnected";
 
 export const Sidebar = () => {
   const { addListener, removeListener } = useContext(WebviewContext);
@@ -18,10 +24,17 @@ export const Sidebar = () => {
     const showPage = (page: Page) => {
       setCurrentPage(page);
     };
+
+    const disconnect = () => {
+      setCurrentPage("disconnected");
+    };
+
     addListener("showPage", showPage);
+    addListener("disconnectServer", disconnect);
 
     return () => {
       removeListener("showPage", showPage);
+      removeListener("disconnectServer", disconnect);
     };
   }, []);
 

@@ -41,6 +41,7 @@ export type SearchResult = {
 };
 
 export type ViewApi = {
+  restartServer: () => void;
   // getFileContents: () => Promise<string>;
   // showExampleViewB: () => void;
   // sendMessageToExampleB: (msg: string) => void;
@@ -80,4 +81,5 @@ export type ViewEvents = {
   showPage: (
     page: "chat" | "history" | "codebases" | "settings" | "search"
   ) => void;
+  disconnectServer: () => void;
 };

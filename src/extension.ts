@@ -15,21 +15,10 @@ import {
 import { SessionManager } from "./sessionManager";
 import { CodebaseManager } from "./codebaseManager";
 import { Backend } from "./backendApi";
+import { shuffle } from "./util";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
-
-  console.log("raider: ", ctx.storageUri || "no uri???");
-  console.log("raider: ", ctx.storageUri?.path || "no path???");
-  console.log("raider: ", ctx.storageUri?.fsPath || "no fspath???");
-
-  const backend = new Backend(
-    vscode.workspace.workspaceFolders
-      ? vscode.workspace.workspaceFolders[0].uri.fsPath
-      : ""
-  );
-  const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
-  const codebaseManager = new CodebaseManager(ctx.storageUri?.fsPath || "", backend);
 
   let currentPage = "chat";
 
@@ -50,7 +39,28 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     });
   };
 
+  console.log("raider: ", ctx.storageUri || "no uri???");
+  console.log("raider: ", ctx.storageUri?.path || "no path???");
+  console.log("raider: ", ctx.storageUri?.fsPath || "no fspath???");
+
+  const backend = new Backend(
+    vscode.workspace.workspaceFolders
+      ? vscode.workspace.workspaceFolders[0].uri.fsPath
+      : "",
+    () => {
+      triggerEvent("disconnectServer");
+    }
+  );
+  const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
+  const codebaseManager = new CodebaseManager(
+    ctx.storageUri?.fsPath || "",
+    backend
+  );
+
   const api: ViewApi = {
+    restartServer: () => {
+      if (!backend.isOpen) backend.start();
+    },
     sendMessage: (msg: Message) => {
       sessionManager.getCurrentSession().message(msg.role, msg.content);
     },
@@ -104,22 +114,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
 
     async search(query: string): Promise<SearchResult[]> {
       // TODO: query
-      function shuffle<T>(array: T[]) {
-        let currentIndex = array.length;
-
-        // While there remain elements to shuffle...
-        while (currentIndex != 0) {
-          // Pick a remaining element...
-          let randomIndex = Math.floor(Math.random() * currentIndex);
-          currentIndex--;
-
-          // And swap it with the current element.
-          [array[currentIndex], array[randomIndex]] = [
-            array[randomIndex],
-            array[currentIndex],
-          ];
-        }
-      }
 
       let results = [
         {
