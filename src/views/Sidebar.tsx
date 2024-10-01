@@ -5,6 +5,7 @@ import { History } from "./pages/History";
 import { Settings } from "./pages/settings";
 import { Codebases } from "./pages/Codebases";
 import { Search } from "./pages/Search";
+import { Disconnected } from "./pages/DisconnectWarning";
 
 type Page =
   | "chat"
@@ -46,6 +47,8 @@ export const Sidebar = () => {
     <Codebases />
   ) : currentPage == "search" ? (
     <Search />
+  ) : currentPage == "disconnected" ? (
+    <Disconnected onReconnect={() => {}} />
   ) : (
     <Chat />
   );

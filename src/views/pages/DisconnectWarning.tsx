@@ -8,7 +8,7 @@ const flashAnimation = keyframes`
   100% { opacity: 1; }
 `;
 
-const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
+export const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
   return (
     <Box
       display="flex"
@@ -33,7 +33,7 @@ const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
       <Typography
         variant="h4"
         sx={{
-          color: "#f44336", 
+          color: "#f44336",
           fontWeight: "bold",
           mt: 2,
           animation: `${flashAnimation} 1.5s infinite`,
@@ -54,5 +54,3 @@ const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
     </Box>
   );
 };
-
-export default Disconnected;
