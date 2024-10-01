@@ -1,5 +1,10 @@
 import WebSocket from "ws";
 import { v4 as uuidv4 } from "uuid";
+import { ThumbUpSharp } from "@mui/icons-material";
+
+export type InitAgentManagerParams = {
+  timeout?: number;
+};
 
 export type InitExternalRepoParams = {
   repo_dir: string;
@@ -18,6 +23,7 @@ export type RunSubtaskParams = {
 export type Request = {
   main_repo_dir: string;
   method:
+    | "init_agent_manager"
     | "init_external_repo_agent"
     | "get_external_repo_agents"
     | "generate_subtasks"
@@ -25,7 +31,11 @@ export type Request = {
     | "generate_commands"
     | "undo"
     | "shutdown";
-  params?: InitExternalRepoParams | GenerateSubtasksParams | RunSubtaskParams;
+  params?:
+    | InitAgentManagerParams
+    | InitExternalRepoParams
+    | GenerateSubtasksParams
+    | RunSubtaskParams;
 };
 
 const keepAlivePing = {
@@ -75,9 +85,17 @@ export class Backend {
 
     this.ws = new WebSocket(this.serverRoute());
 
-    this.ws.on("open", this.onOpen);
-    this.ws.on("close", this.onClose);
-    this.ws.on("message", this.processMessage);
+    let _self = this;
+
+    this.ws.on("open", () => {
+      this.onOpen(_self);
+    });
+    this.ws.on("close", () => {
+      this.onClose(_self);
+    });
+    this.ws.on("message", (message: string) => {
+      this.processMessage(_self, message);
+    });
   }
 
   createPromise(): Promise<string> {
@@ -92,6 +110,7 @@ export class Backend {
 
   async sendMsg(
     method:
+      | "init_agent_manager"
       | "init_external_repo_agent"
       | "get_external_repo_agents"
       | "generate_subtasks"
@@ -100,6 +119,7 @@ export class Backend {
       | "undo"
       | "shutdown",
     params:
+      | InitAgentManagerParams
       | InitExternalRepoParams
       | GenerateSubtasksParams
       | RunSubtaskParams
@@ -119,10 +139,16 @@ export class Backend {
     return await this.currentPromise;
   }
 
+  async initAgentManager(timeout: number = 60) {
+    await this.sendMsg("init_agent_manager", {
+      timeout,
+    } as InitAgentManagerParams);
+  }
+
   async initExternalRepo(
     repoDir: string,
     modelName: string = "azure/gpt4o",
-    timeout: number = 20
+    timeout: number = 60
   ) {
     await this.sendMsg("init_external_repo_agent", {
       repo_dir: repoDir,
@@ -131,8 +157,9 @@ export class Backend {
     } as InitExternalRepoParams);
   }
 
-  async getExternalRepoAgents(): Promise<string> {
-    return await this.sendMsg("get_external_repo_agents");
+  async getExternalRepoAgents(): Promise<string[]> {
+    let response = await this.sendMsg("get_external_repo_agents");
+    return JSON.parse(response) as string[];
   }
 
   async generateSubtasks(objective: string): Promise<string[]> {
@@ -144,32 +171,33 @@ export class Backend {
     return await this.sendMsg("run_subtask", { subtask });
   }
 
-  processMessage(message: string) {
+  processMessage(self: this, message: string) {
     let partialResponseData = JSON.parse(message);
 
     if (partialResponseData == keepAlivePing) return;
     if (partialResponseData == endOfMessageResponse) {
-      this.responding = false;
-      this.expectingResponse = false;
+      self.responding = false;
+      self.expectingResponse = false;
     }
 
-    this.responding = true;
+    self.responding = true;
     if ("error" in partialResponseData) {
-      this.currentGeneration += partialResponseData["error"] as string;
+      self.currentGeneration += partialResponseData["error"] as string;
     } else if ("result" in partialResponseData) {
-      this.currentGeneration += partialResponseData["result"] as string;
+      self.currentGeneration += partialResponseData["result"] as string;
     }
   }
 
-  onOpen() {
-    console.log(`Connected to ${this.serverRoute()}`);
-    this.isOpen = true;
+  onOpen(self: this) {
+    self.isOpen = true;
+    console.log(`Connected to server`);
+    self.initAgentManager();
   }
 
-  onClose() {
+  onClose(self: this) {
+    self.isOpen = false;
+    self.onCloseAction();
     console.log("Disconnected from server");
-    this.isOpen = false;
-    this.onCloseAction();
   }
 
   async open() {
