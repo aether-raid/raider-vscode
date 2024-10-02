@@ -8,7 +8,7 @@ const flashAnimation = keyframes`
   100% { opacity: 1; }
 `;
 
-const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
+export const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
   return (
     <Box
       display="flex"
@@ -16,7 +16,7 @@ const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
       justifyContent="center"
       alignItems="center"
       minHeight="100vh"
-      bgcolor="#f8d7da"  // Light red background
+      bgcolor="#f8d7da" // Light red background
     >
       {/* Error icon */}
       <IconButton>
@@ -37,6 +37,8 @@ const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
           fontWeight: "bold",
           mt: 2,
           animation: `${flashAnimation} 1.5s infinite`,
+          align: "center",
+          textAlign: "center",
         }}
       >
         System Disconnected!
@@ -54,5 +56,3 @@ const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
     </Box>
   );
 };
-
-export default Disconnected;
