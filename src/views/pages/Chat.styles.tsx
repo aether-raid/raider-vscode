@@ -25,7 +25,7 @@ export const roleColors = {
 // #007acc
 
 function getRoleColor(role: string) {
-  return Object.entries(roleColors).find(([key, val]) => key === role)?.[1];
+  return Object.entries(roleColors).find(([key, /*val*/]) => key === role)?.[1];
 }
 
 export const ChatBubbleContainer = styled.div<ChatBubbleProps>`
