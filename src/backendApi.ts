@@ -1,6 +1,5 @@
-import WebSocket from "ws";
+import WebSocket, { RawData } from "ws";
 import { v4 as uuidv4 } from "uuid";
-import { ThumbUpSharp } from "@mui/icons-material";
 
 export type InitAgentManagerParams = {
   timeout?: number;
@@ -36,14 +35,6 @@ export type Request = {
     | InitExternalRepoParams
     | GenerateSubtasksParams
     | RunSubtaskParams;
-};
-
-const keepAlivePing = {
-  "<PING>": "",
-};
-
-const endOfMessageResponse = {
-  "<END_OF_MESSAGE>": "",
 };
 
 export class Backend {
@@ -93,8 +84,20 @@ export class Backend {
     this.ws.on("close", () => {
       this.onClose(_self);
     });
-    this.ws.on("message", (message: string) => {
-      this.processMessage(_self, message);
+    this.ws.on("message", (data: RawData) => {
+      console.log(`raider-chat 0: ${data}`);
+
+      function processData(data: any) {
+        return JSON.parse(
+          Object.getOwnPropertyNames(data)
+            .map((value) => {
+              return String.fromCharCode(data[value]);
+            })
+            .join("") || "{}"
+        );
+      }
+
+      this.processMessage(_self, processData(data));
     });
   }
 
@@ -106,6 +109,41 @@ export class Backend {
         }
       }, 1000);
     });
+  }
+
+  processMessage(self: this, message: any) {
+    console.log(
+      `raider-chat 3: ${message} ${Object.getOwnPropertyNames(
+        message
+      )} ${typeof message}`
+    );
+
+    let propertyNames = Object.getOwnPropertyNames(message);
+    propertyNames.forEach((value) => {
+      console.log(`raider-chat 3: ${value} ${message[value]}`);
+    });
+
+    if ("<PING>" in message) {
+      console.log("raider-chat pinged off");
+      return;
+    }
+    // if (isEquivalent(message, keepAlivePing)) return;
+    if ("<END_OF_MESSAGE>" in message) {
+      //|| isEquivalent(message, endOfMessageResponse)) {
+      console.log("raider-chat end of message hit woohoo");
+      self.responding = false;
+      self.expectingResponse = false;
+      return;
+    }
+
+    console.log("raider-chat it survived! it SURVIVED!!!!!!!!!!!!");
+
+    self.responding = true;
+    if ("error" in message) {
+      self.currentGeneration += message["error"] as string;
+    } else if ("result" in message) {
+      self.currentGeneration += message["result"] as string;
+    }
   }
 
   async sendMsg(
@@ -125,8 +163,10 @@ export class Backend {
       | RunSubtaskParams
       | undefined = undefined
   ): Promise<string> {
-    if (this.ws === null) return "";
+    if (this.ws === null) throw Error("raider: oi you're disconnected cibai");
+    console.log(`ws is not null, running ${method}`);
     await this.currentPromise;
+    console.log(`awaiting current promise which never closed!`);
     this.ws.send(
       JSON.stringify({
         main_repo_dir: this.workspaceDir,
@@ -150,6 +190,7 @@ export class Backend {
     modelName: string = "azure/gpt4o",
     timeout: number = 60
   ) {
+    console.log(`raider init external repo ${repoDir}`);
     await this.sendMsg("init_external_repo_agent", {
       repo_dir: repoDir,
       model_name: modelName,
@@ -159,33 +200,16 @@ export class Backend {
 
   async getExternalRepoAgents(): Promise<string[]> {
     let response = await this.sendMsg("get_external_repo_agents");
-    return JSON.parse(response) as string[];
+    return JSON.parse(response || "[]") as string[];
   }
 
   async generateSubtasks(objective: string): Promise<string[]> {
     let response = await this.sendMsg("generate_subtasks", { objective });
-    return JSON.parse(response) as string[];
+    return JSON.parse(response || "[]") as string[];
   }
 
   async runSubtask(subtask: string) {
     return await this.sendMsg("run_subtask", { subtask });
-  }
-
-  processMessage(self: this, message: string) {
-    let partialResponseData = JSON.parse(message);
-
-    if (partialResponseData == keepAlivePing) return;
-    if (partialResponseData == endOfMessageResponse) {
-      self.responding = false;
-      self.expectingResponse = false;
-    }
-
-    self.responding = true;
-    if ("error" in partialResponseData) {
-      self.currentGeneration += partialResponseData["error"] as string;
-    } else if ("result" in partialResponseData) {
-      self.currentGeneration += partialResponseData["result"] as string;
-    }
   }
 
   onOpen(self: this) {
@@ -198,6 +222,7 @@ export class Backend {
     self.isOpen = false;
     self.onCloseAction();
     console.log("Disconnected from server");
+    this.ws = null;
   }
 
   async open() {
