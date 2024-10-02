@@ -116,6 +116,7 @@ export class CodebaseManager {
   }
 
   async add(uri: string) {
+    console.log(`raider: I tried to add a repo ${uri}`);
     let codebase = new LocalCodebase(uri);
     await this.backendInstance.initExternalRepo(codebase.uri);
     this.codebases.push(codebase);
@@ -135,9 +136,9 @@ export class CodebaseManager {
   }
 
   async getAllCodebases(): Promise<string[]> {
-    let codebases = await this.backendInstance.getExternalRepoAgents();
-    // this.codebases =
-    return codebases;
+    // let codebases = await this.backendInstance.getExternalRepoAgents();
+    return this.codebases.map((it) => it.uri);
+    // return codebases;
   }
 
   async save(): Promise<boolean> {
