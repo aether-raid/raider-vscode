@@ -37,6 +37,7 @@ export const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
           fontWeight: "bold",
           mt: 2,
           animation: `${flashAnimation} 1.5s infinite`,
+          alignContent: "center",
         }}
       >
         System Disconnected!
