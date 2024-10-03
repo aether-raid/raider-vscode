@@ -93,6 +93,7 @@ export const Search = () => {
 
   const search = async () => {
     let results = await callApi("search", searchText);
+    console.log(results);
     setSearchResults(results);
   };
 

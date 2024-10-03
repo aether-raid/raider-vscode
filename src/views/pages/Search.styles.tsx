@@ -76,13 +76,20 @@ export const SearchField = ({
   return (
     <SearchInputContainer>
       <SearchInput
+        maxRows={10}
         placeholder="Search now..."
+        multiline
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={onEnter}
         endAdornment={
           <SearchInputIconContainer position="end">
-            <IconButton onClick={handleSearch}>
+            <IconButton
+              aria-label="send chat"
+              edge="end"
+              onClick={handleSearch}
+              disabled={input && input.length == 0 ? true : false}
+            >
               <Search />
             </IconButton>
           </SearchInputIconContainer>
