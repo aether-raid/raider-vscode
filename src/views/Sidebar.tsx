@@ -16,7 +16,7 @@ type Page =
   | "disconnected";
 
 export const Sidebar = () => {
-  const { addListener, removeListener } = useContext(WebviewContext);
+  const { callApi, addListener, removeListener } = useContext(WebviewContext);
 
   // const [isHistoryPage, setHistoryPage] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>("chat");
@@ -30,12 +30,22 @@ export const Sidebar = () => {
       setCurrentPage("disconnected");
     };
 
+    const updateConnection = async () => {
+      const isConnected = await callApi("isConnected");
+      if (!isConnected) setCurrentPage("disconnected");
+    };
+
     addListener("showPage", showPage);
     addListener("disconnectServer", disconnect);
+
+    let interval = setInterval(() => {
+      updateConnection();
+    }, 500);
 
     return () => {
       removeListener("showPage", showPage);
       removeListener("disconnectServer", disconnect);
+      clearInterval(interval);
     };
   }, []);
 
@@ -48,7 +58,13 @@ export const Sidebar = () => {
   ) : currentPage == "search" ? (
     <Search />
   ) : currentPage == "disconnected" ? (
-    <Disconnected onReconnect={() => {}} />
+    <Disconnected
+      onReconnect={() => {
+        callApi("reconnect").then(() => {
+          callApi("navigateTo", "chat");
+        });
+      }}
+    />
   ) : (
     <Chat />
   );
