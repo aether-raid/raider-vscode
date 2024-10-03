@@ -101,6 +101,10 @@ export class Session {
     if (!changed) this.messages = messages;
   }
 
+  updateLastResponse(content: string) {
+    this.messages[this.messages.length - 1].content = content;
+  }
+
   export(): SessionData {
     return {
       id: this.id,

@@ -15,7 +15,9 @@ import {
 } from "./Chat.styles";
 import { Message } from "../types";
 import { Fab } from "@mui/material";
-import { /* Replay, RotateLeft, */ RotateLeftOutlined } from "@mui/icons-material";
+import {
+  /* Replay, RotateLeft, */ RotateLeftOutlined,
+} from "@mui/icons-material";
 // import {
 //   ChatBubbleOutlineOutlined,
 //   KeyboardDoubleArrowRight,
@@ -33,26 +35,48 @@ export const Chat = () => {
 
   const addChatBubble = (content: string, role: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, role }]);
-    callApi("sendMessage", { role, content });
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim()) {
-      addChatBubble(input, "user");
+      let prompt = input.trim();
+      addChatBubble(prompt, "user");
+      addChatBubble("Thinking...\n\n", "assistant");
       setInput("");
 
-      // llm processing thingy, rn not relevant
-      let output = "I'm a helpful assistant, sorry";
+      // let response =
+      await callApi("sendMessage", {
+        role: "user",
+        content: prompt,
+      });
 
-      addChatBubble(output, "assistant");
+      // console.log(`raider-chat ${response}`);
+      // console.log(`raider-chat ${typeof response}`);
+
+      // let propertyNames = Object.getOwnPropertyNames(response);
+      // console.log(`raider-chat ${propertyNames}`);
+      // propertyNames.forEach((value) => {
+      // console.log(`raider-chat 3: ${value} ${(response as any)[value]}`);
+      // });
+
+      // for await (const result of response) {
+      // setMessages((messages) => {
+      // let lastMessage = messages.pop() || {
+      // role: "assistant",
+      // content: "",
+      // };
+      // lastMessage.content += result;
+      // return [...messages, lastMessage];
+      // });
+      // }
+
+      // // llm processing thingy, rn not relevant
+      // let output = "I'm a helpful assistant, sorry";
+
+      // addChatBubble(output, "assistant");
     }
   };
 
-  // const resetMessageHistory = () => {
-  //   // TODO
-  //   callApi("resetMessageHistory");
-  //   setMessages([]);
-  // };
   const fetchMessages = async () => {
     setMessages(await callApi("getMessages"));
   };
@@ -78,26 +102,6 @@ export const Chat = () => {
 
   return (
     <ChatContainer>
-      {/* <ChatHeader> */}
-      {/* <CloseChatButton>
-          <KeyboardDoubleArrowRight />
-        </CloseChatButton> */}
-      {/* <ChatInfoContainer> */}
-      {/* <Typography variant={"h5"}>RAiDer</Typography> */}
-      {/* <ChatStatus disabled>
-            <ChatBubbleOutlineOutlined sx={{ width: "16px", height: "16px" }} />
-            <Typography variant={"caption"} sx={{ color: "#43ff00" }}>
-              Active
-            </Typography>
-          </ChatStatus> */}
-      {/* </ChatInfoContainer> */}
-      {/* <IconButton
-          aria-label="reset conversation"
-          onClick={resetMessageHistory}
-        >
-          <RotateLeftOutlined style={{ color: "white" }} />
-        </IconButton> */}
-      {/* </ChatHeader> */}
       <MessagesContainer>
         {messages.map((msg, index) => (
           <MessageBubble message={msg} key={index} />

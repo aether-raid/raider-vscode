@@ -63,8 +63,39 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     restartServer: () => {
       if (!backend.isOpen) backend.start();
     },
-    sendMessage: (msg: Message) => {
+    sendMessage: async function (msg: Message) {
       sessionManager.getCurrentSession().message(msg.role, msg.content);
+
+      let output = "Thinking...\n\n";
+
+      sessionManager.getCurrentSession().message("assistant", output);
+
+      console.log("appended messages, calling generate now");
+
+      let subtasks = await backend.generateSubtasks(msg.content);
+
+      let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
+        .map((value, idx) => `${idx + 1}. ${value}`)
+        .join("\n")}\n`;
+
+      output += subtaskGeneration;
+      sessionManager.getCurrentSession().updateLastResponse(output);
+
+      //yield subtaskGeneration;
+
+      for (let i = 0; i < subtasks.length; i++) {
+        output += `\nRunning Subtask ${i + 1}...\n`;
+        sessionManager.getCurrentSession().updateLastResponse(output);
+        //yield `\nRunning Subtask ${i + 1}...\n`;
+
+        let subtaskOutput = await backend.runSubtask(subtasks[i]);
+        output += subtaskOutput;
+        sessionManager.getCurrentSession().updateLastResponse(output);
+        //yield subtaskOutput;
+      }
+
+      output += `\n\nCompleted ${subtasks.length} Tasks.`;
+      sessionManager.getCurrentSession().updateLastResponse(output);
     },
     getMessages: () => {
       return sessionManager.getCurrentSession().messages;
@@ -232,7 +263,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
 
   pages.forEach((page) => {
     vscode.commands.registerCommand(`raider.${page}`, () => {
-      // TODO
       console.log(`raider.${page} called`);
       console.log(page, "cooked");
       triggerEvent("showPage", page);
