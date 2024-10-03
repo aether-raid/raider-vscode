@@ -102,7 +102,9 @@ export class Session {
   }
 
   updateLastResponse(content: string) {
-    this.messages[this.messages.length - 1].content = content;
+    let message = this.messages.pop() || { role: "assistant", content: "" };
+    message.content = content;
+    this.messages.push(message);
   }
 
   export(): SessionData {
