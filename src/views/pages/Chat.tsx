@@ -35,6 +35,7 @@ export const Chat = () => {
 
   const addChatBubble = (content: string, role: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, role }]);
+    callApi("sendMessage", { content, role });
   };
 
   const handleSend = async () => {
@@ -44,11 +45,43 @@ export const Chat = () => {
       addChatBubble("Thinking...\n\n", "assistant");
       setInput("");
 
+      let subtasks = (await callApi("generateSubtasks", prompt)).filter(
+        (it) => it.task_type !== "User action"
+      );
+
+      if (subtasks.length === 0) {
+        addChatBubble(
+          "RAiDer was unable to formulate a plan based on the provided codebase and prompt. This most likely means that the functionality is already implemented and is hence unnecessary for us to update.",
+          "assistant"
+        );
+        return;
+      }
+
+      let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
+        .map((value, idx) => `${idx + 1}. ${value.task_body}`)
+        .join("\n")}\n`;
+      addChatBubble(subtaskGeneration, "assistant");
+
+      // for(let subtask of subtasks) {
+      //   let result = await callApi("runSubtask", subtask.task_body);
+      //   addChatBubble(result, "assistant");
+      // }
+
       // let response =
-      await callApi("sendMessage", {
-        role: "user",
-        content: prompt,
-      });
+      // let g = await callApi("sendMessage", {
+      //   role: "user",
+      //   content: prompt,
+      // });
+
+      // console.log(
+      //   `raider-chat ${g} ${typeof g} ${JSON.stringify(
+      //     g
+      //   )} ${Object.getOwnPropertyNames(g)}`
+      // );
+
+      // for await (const result of g) {
+      //   addChatBubble(result, "assistant");
+      // }
 
       // console.log(`raider-chat ${response}`);
       // console.log(`raider-chat ${typeof response}`);
