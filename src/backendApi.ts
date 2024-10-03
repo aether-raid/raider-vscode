@@ -124,7 +124,7 @@ export class Backend {
     });
 
     if ("<PING>" in message) {
-      console.log("raider-chat pinged off");
+      console.log("raider-chat pinged");
       return;
     }
     // if (isEquivalent(message, keepAlivePing)) return;
@@ -163,10 +163,10 @@ export class Backend {
       | RunSubtaskParams
       | undefined = undefined
   ): Promise<string> {
-    if (this.ws === null) throw Error("raider: oi you're disconnected cibai");
-    console.log(`ws is not null, running ${method}`);
+    if (this.ws === null) throw Error("raider-chat: disconnected!");
+    console.log(`raider-chat: ws is not null, running ${method}`);
     await this.currentPromise;
-    console.log(`awaiting current promise which never closed!`);
+    console.log(`raider-chat: awaiting current promise which never closed!`);
     this.ws.send(
       JSON.stringify({
         main_repo_dir: this.workspaceDir,
