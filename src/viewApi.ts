@@ -40,12 +40,21 @@ export type SearchResult = {
   url: string;
 };
 
+export type Subtask = {
+  task_type: "User action" | "Command execution" | "Coding";
+  task_body: string;
+};
+
 export type ViewApi = {
   restartServer: () => void;
   // getFileContents: () => Promise<string>;
   // showExampleViewB: () => void;
   // sendMessageToExampleB: (msg: string) => void;
   sendMessage: (msg: Message) => Promise<void>;
+
+  generateSubtasks: (objective: string) => Promise<Subtask[]>;
+  runSubtask: (task: string) => Promise<string>;
+
   getMessages: () => Message[];
   getSessions: () => Session[];
   resetMessageHistory: () => void;
@@ -56,7 +65,7 @@ export type ViewApi = {
 
   getCodebases: () => Promise<string[]>;
   openAddCodebase: () => Promise<void>;
-  removeCodebase: (uri: string) => void;
+  removeCodebase: (uri: string) => Promise<void>;
 
   search: (query: string) => Promise<SearchResult[]>;
 
@@ -69,6 +78,10 @@ export type ViewApi = {
   openInNewWindow: (dir: string) => void;
 
   writeToClipboard: (text: string) => void;
+
+  isConnected: () => boolean;
+
+  reconnect: () => void;
 };
 
 export type ViewEvents = {

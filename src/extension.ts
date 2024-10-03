@@ -63,44 +63,86 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     restartServer: () => {
       if (!backend.isOpen) backend.start();
     },
+
+    generateSubtasks: async (objective) => {
+      let subtasks = await backend.generateSubtasks(objective);
+
+      return subtasks;
+    },
+
+    runSubtask: async function (subtask) {
+      return backend.runSubtask(subtask, (chunk) => {
+        sessionManager.getCurrentSession().updateLastResponse(chunk);
+      });
+    },
+
     sendMessage: async function (msg: Message) {
       sessionManager.getCurrentSession().message(msg.role, msg.content);
+      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+      // let output = "Thinking...\n\n";
 
-      let output = "Thinking...\n\n";
+      // // yield output;
 
-      sessionManager.getCurrentSession().message("assistant", output);
+      // sessionManager.getCurrentSession().message("assistant", output);
+      // triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
 
-      console.log("appended messages, calling generate now");
+      // console.log("appended messages, calling generate now");
 
-      let subtasks = await backend.generateSubtasks(msg.content);
+      // let subtasks = await backend.generateSubtasks(msg.content);
 
-      console.log("generated subtasks successfully");
+      // console.log("generated subtasks successfully");
 
-      let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
-        .map((value, idx) => `${idx + 1}. ${value}`)
-        .join("\n")}\n`;
+      // if (subtasks.length == 0) {
+      //   let sorryOutput =
+      //     "RAiDer was unable to formulate a plan based on the provided codebase and prompt. This most likely means that the functionality is already implemented and is hence unnecessary for us to update.";
+      //   output += sorryOutput;
+      //   sessionManager.getCurrentSession().updateLastResponse(output);
+      //   triggerEvent(
+      //     "sendMessages",
+      //     sessionManager.getCurrentSession().messages
+      //   );
+      //   // yield sorryOutput;
+      //   return;
+      // }
 
-      output += subtaskGeneration;
-      sessionManager.getCurrentSession().updateLastResponse(output);
+      // let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
+      //   .map((value, idx) => `${idx + 1}. ${value}`)
+      //   .join("\n")}\n`;
 
-      console.log("Updated chat history, running subtasks individually rn")
+      // output += subtaskGeneration;
+      // sessionManager.getCurrentSession().updateLastResponse(output);
+      // triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+
+      // yield subtaskGeneration;
+
+      // console.log("Updated chat history, running subtasks individually rn");
 
       //yield subtaskGeneration;
 
-      for (let i = 0; i < subtasks.length; i++) {
-        console.log(`Running Subtask ${i + 1}`);
-        output += `\nRunning Subtask ${i + 1}...\n`;
-        sessionManager.getCurrentSession().updateLastResponse(output);
-        //yield `\nRunning Subtask ${i + 1}...\n`;
+      // for (let i = 0; i < subtasks.length; i++) {
+      //   console.log(`Running Subtask ${i + 1}`);
+      //   output += `\nRunning Subtask ${i + 1}...\n`;
+      //   sessionManager.getCurrentSession().updateLastResponse(output);
+      //   triggerEvent(
+      //     "sendMessages",
+      //     sessionManager.getCurrentSession().messages
+      //   );
+      //   //yield `\nRunning Subtask ${i + 1}...\n`;
+      //   yield `\nRunning Subtask ${i + 1}...\n`;
 
-        let subtaskOutput = await backend.runSubtask(subtasks[i]);
-        output += subtaskOutput;
-        sessionManager.getCurrentSession().updateLastResponse(output);
-        //yield subtaskOutput;
-      }
+      //   let subtaskOutput = await backend.runSubtask(subtasks[i]);
+      //   output += subtaskOutput;
+      //   sessionManager.getCurrentSession().updateLastResponse(output);
+      //   triggerEvent(
+      //     "sendMessages",
+      //     sessionManager.getCurrentSession().messages
+      //   );
+      //   //yield subtaskOutput;
+      // }
 
-      output += `\n\nCompleted ${subtasks.length} Tasks.`;
-      sessionManager.getCurrentSession().updateLastResponse(output);
+      // output += `\n\nCompleted ${subtasks.length} Tasks.`;
+      // sessionManager.getCurrentSession().updateLastResponse(output);
+      // triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
     getMessages: () => {
       return sessionManager.getCurrentSession().messages;
@@ -146,39 +188,41 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       if (uris?.length) codebaseManager.add(uris[0].fsPath);
     },
 
-    removeCodebase(uri: string) {
+    async removeCodebase(uri: string) {
+      await backend.disableExternalRepoAgent(uri);
       codebaseManager.remove(uri);
     },
 
     async search(query: string): Promise<SearchResult[]> {
+      return await backend.webRaiderQuery(query);
       // TODO: query
 
-      let results = [
-        {
-          type: "github",
-          name: "codebase 1",
-          url: "https://github.com/microsoft/vscode",
-        },
-        {
-          type: "gitlab",
-          name: "codebase 2",
-          url: "https://gitlab.com/gitlab-org/gitlab",
-        },
-        {
-          type: "bitbucket",
-          name: "codebase 3",
-          url: "https://bitbucket.io/hello/world",
-        },
-        {
-          type: "gitee",
-          name: "codebase 4",
-          url: "https://gitee.com/woodywrx/pity",
-        },
-      ] as SearchResult[];
+      // let results = [
+      //   {
+      //     type: "github",
+      //     name: "codebase 1",
+      //     url: "https://github.com/microsoft/vscode",
+      //   },
+      //   {
+      //     type: "gitlab",
+      //     name: "codebase 2",
+      //     url: "https://gitlab.com/gitlab-org/gitlab",
+      //   },
+      //   {
+      //     type: "bitbucket",
+      //     name: "codebase 3",
+      //     url: "https://bitbucket.io/hello/world",
+      //   },
+      //   {
+      //     type: "gitee",
+      //     name: "codebase 4",
+      //     url: "https://gitee.com/woodywrx/pity",
+      //   },
+      // ] as SearchResult[];
 
-      shuffle(results);
+      // shuffle(results);
 
-      return results.slice(0, Math.max(1, Math.ceil(Math.random() * 5)));
+      // return results.slice(0, Math.max(1, Math.ceil(Math.random() * 5)));
     },
 
     navigateTo: (
@@ -206,6 +250,14 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
 
     writeToClipboard: (text: string) => {
       vscode.env.clipboard.writeText(text);
+    },
+
+    isConnected: () => {
+      return backend.isOpen;
+    },
+
+    reconnect: () => {
+      if (!backend.isOpen) backend.start();
     },
   };
 
@@ -270,8 +322,10 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     vscode.commands.registerCommand(`raider.${page}`, () => {
       console.log(`raider.${page} called`);
       console.log(page, "cooked");
-      triggerEvent("showPage", page);
-      currentPage = page;
+      if (backend.isOpen) {
+        triggerEvent("showPage", page);
+        currentPage = page;
+      }
     });
   });
 };
