@@ -36,6 +36,8 @@ export const Disconnected = ({ onReconnect }: { onReconnect: () => void }) => {
           color: "#f44336", // Red color
           fontWeight: "bold",
           mt: 2,
+          ml: 2,
+          mr: 2,
           animation: `${flashAnimation} 1.5s infinite`,
           align: "center",
           textAlign: "center",
