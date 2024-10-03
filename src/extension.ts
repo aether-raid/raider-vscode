@@ -74,6 +74,8 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
 
       let subtasks = await backend.generateSubtasks(msg.content);
 
+      console.log("generated subtasks successfully");
+
       let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
         .map((value, idx) => `${idx + 1}. ${value}`)
         .join("\n")}\n`;
@@ -81,9 +83,12 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       output += subtaskGeneration;
       sessionManager.getCurrentSession().updateLastResponse(output);
 
+      console.log("Updated chat history, running subtasks individually rn")
+
       //yield subtaskGeneration;
 
       for (let i = 0; i < subtasks.length; i++) {
+        console.log(`Running Subtask ${i + 1}`);
         output += `\nRunning Subtask ${i + 1}...\n`;
         sessionManager.getCurrentSession().updateLastResponse(output);
         //yield `\nRunning Subtask ${i + 1}...\n`;

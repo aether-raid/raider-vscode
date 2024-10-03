@@ -105,7 +105,9 @@ export class Backend {
     return new Promise<string>((resolve, reject) => {
       setInterval(() => {
         if (!this.expectingResponse && !this.responding) {
-          resolve(this.currentGeneration);
+          let generation = this.currentGeneration;
+          this.currentGeneration = "";
+          resolve(generation);
         }
       }, 1000);
     });
@@ -131,6 +133,7 @@ export class Backend {
     if ("<END_OF_MESSAGE>" in message) {
       //|| isEquivalent(message, endOfMessageResponse)) {
       console.log("raider-chat end of message hit woohoo");
+      console.log(`raider-chat generated shit malig ${self.currentGeneration}`);
       self.responding = false;
       self.expectingResponse = false;
       return;
@@ -140,9 +143,10 @@ export class Backend {
 
     self.responding = true;
     if ("error" in message) {
-      self.currentGeneration += message["error"] as string;
+      self.currentGeneration = message["error"] as string;
     } else if ("result" in message) {
-      self.currentGeneration += message["result"] as string;
+      console.log(`messaging ${message["result"]} ${typeof message["result"]}`);
+      self.currentGeneration = JSON.stringify(message["result"]);
     }
   }
 
