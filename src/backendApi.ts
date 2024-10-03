@@ -19,22 +19,50 @@ export type RunSubtaskParams = {
   subtask: string;
 };
 
+export type ToggleExternalRepoParams = {
+  agent_id: string;
+};
+
+export type WebRaiderQueryParams = {
+  user_query: string;
+};
+
+export type RequestMethod =
+  | "init_agent_manager"
+  | "init_external_repo_agent"
+  | "get_external_repo_agents"
+  | "generate_subtasks"
+  | "run_subtask"
+  | "generate_commands"
+  | "disable_external_repo_agent"
+  | "enable_external_repo_agent"
+  | "query"
+  | "undo"
+  | "shutdown";
+
+export type RequestParams =
+  | InitAgentManagerParams
+  | InitExternalRepoParams
+  | GenerateSubtasksParams
+  | RunSubtaskParams
+  | ToggleExternalRepoParams
+  | WebRaiderQueryParams;
+
 export type Request = {
   main_repo_dir: string;
-  method:
-    | "init_agent_manager"
-    | "init_external_repo_agent"
-    | "get_external_repo_agents"
-    | "generate_subtasks"
-    | "run_subtask"
-    | "generate_commands"
-    | "undo"
-    | "shutdown";
-  params?:
-    | InitAgentManagerParams
-    | InitExternalRepoParams
-    | GenerateSubtasksParams
-    | RunSubtaskParams;
+  method: RequestMethod;
+  params?: RequestParams;
+};
+
+export type Subtask = {
+  task_type: "User action" | "Command execution" | "Coding";
+  task_body: string;
+};
+
+export type WebRaiderResult = {
+  type: "github" | "gitlab" | "bitbucket" | "gitee";
+  name: string;
+  url: string;
 };
 
 export class Backend {
@@ -53,6 +81,8 @@ export class Backend {
   currentPromise: Promise<string> | null = null;
 
   onCloseAction: () => void = () => {};
+
+  onMessageAction: (self: this, message: any) => void = (_, __) => {};
 
   serverRoute(): string {
     return `ws://localhost:${this.serverPort}/ws/${this.sessionId}`;
@@ -142,35 +172,27 @@ export class Backend {
     console.log("raider-chat it survived! it SURVIVED!!!!!!!!!!!!");
 
     self.responding = true;
-    if ("error" in message) {
-      self.currentGeneration = message["error"] as string;
-    } else if ("result" in message) {
-      console.log(`messaging ${message["result"]} ${typeof message["result"]}`);
-      self.currentGeneration = JSON.stringify(message["result"]);
-    }
+
+    self.onMessageAction(self, message);
+
+    // if ("error" in message) {
+    //   self.currentGeneration = message["error"] as string;
+    // } else if ("result" in message) {
+    //   console.log(`messaging ${message["result"]} ${typeof message["result"]}`);
+    //   self.currentGeneration = JSON.stringify(message["result"]);
+    // }
   }
 
   async sendMsg(
-    method:
-      | "init_agent_manager"
-      | "init_external_repo_agent"
-      | "get_external_repo_agents"
-      | "generate_subtasks"
-      | "run_subtask"
-      | "generate_commands"
-      | "undo"
-      | "shutdown",
-    params:
-      | InitAgentManagerParams
-      | InitExternalRepoParams
-      | GenerateSubtasksParams
-      | RunSubtaskParams
-      | undefined = undefined
+    method: RequestMethod,
+    params: RequestParams | undefined = undefined,
+    onMessageAction: (self: this, message: any) => void = (_, __) => {}
   ): Promise<string> {
     if (this.ws === null) throw Error("raider-chat: disconnected!");
     console.log(`raider-chat: ws is not null, running ${method}`);
     await this.currentPromise;
-    console.log(`raider-chat: awaiting current promise which never closed!`);
+    console.log(`raider-chat: awaited previous promise which never closed!`);
+    this.onMessageAction = onMessageAction;
     this.ws.send(
       JSON.stringify({
         main_repo_dir: this.workspaceDir,
@@ -203,17 +225,91 @@ export class Backend {
   }
 
   async getExternalRepoAgents(): Promise<string[]> {
-    let response = await this.sendMsg("get_external_repo_agents");
+    let response = await this.sendMsg(
+      "get_external_repo_agents",
+      undefined,
+      (self, message) => {
+        if ("error" in message) {
+          self.currentGeneration = JSON.stringify(message["error"]);
+        } else if ("result" in message) {
+          console.log(
+            `messaging ${message["result"]} ${typeof message["result"]}`
+          );
+          self.currentGeneration = JSON.stringify(message["result"]);
+        }
+      }
+    );
     return JSON.parse(response || "[]") as string[];
   }
 
-  async generateSubtasks(objective: string): Promise<string[]> {
-    let response = await this.sendMsg("generate_subtasks", { objective });
-    return JSON.parse(response || "[]") as string[];
+  async disableExternalRepoAgent(agent_id: string): Promise<void> {
+    await this.sendMsg("disable_external_repo_agent", {
+      agent_id,
+    } as ToggleExternalRepoParams);
   }
 
-  async runSubtask(subtask: string) {
-    return await this.sendMsg("run_subtask", { subtask });
+  async enableExternalRepoAgent(agent_id: string): Promise<void> {
+    await this.sendMsg("enable_external_repo_agent", {
+      agent_id,
+    } as ToggleExternalRepoParams);
+  }
+
+  async webRaiderQuery(user_query: string): Promise<WebRaiderResult[]> {
+    let response = await this.sendMsg(
+      "query",
+      { user_query },
+      (self, message) => {
+        if ("error" in message) {
+          self.currentGeneration = JSON.stringify(message["error"]);
+        } else if ("result" in message) {
+          console.log(
+            `messaging ${message["result"]} ${typeof message["result"]}`
+          );
+          self.currentGeneration = JSON.stringify(message["result"]);
+        }
+      }
+    );
+    console.log(
+      `${response} ${typeof response} ${JSON.stringify(response)} ${JSON.parse(
+        response || "[]"
+      )}`
+    );
+    return JSON.parse(response || "[]") as WebRaiderResult[];
+  }
+
+  async generateSubtasks(objective: string): Promise<Subtask[]> {
+    let response = await this.sendMsg(
+      "generate_subtasks",
+      { objective },
+      (self, message) => {
+        if ("error" in message) {
+          self.currentGeneration = JSON.stringify(message["error"]);
+        } else if ("result" in message) {
+          console.log(
+            `messaging ${message["result"]} ${typeof message["result"]}`
+          );
+          self.currentGeneration = JSON.stringify(message["result"]);
+        }
+      }
+    );
+    return JSON.parse(response || "[]") as Subtask[];
+  }
+
+  async runSubtask(
+    subtask: string,
+    onChunk: (chunk: string) => void = () => {}
+  ): Promise<string> {
+    return await this.sendMsg("run_subtask", { subtask }, (self, message) => {
+      if ("error" in message) {
+        self.currentGeneration += JSON.stringify(message["error"]);
+      } else if ("result" in message) {
+        console.log(
+          `messaging ${message["result"]} ${typeof message["result"]}`
+        );
+        self.currentGeneration += JSON.stringify(message["result"]);
+        onChunk(JSON.stringify(message["result"]));
+      }
+    });
   }
 
   onOpen(self: this) {
