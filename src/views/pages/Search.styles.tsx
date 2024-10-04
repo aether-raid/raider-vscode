@@ -6,6 +6,7 @@ import {
   IconButton,
   Card,
   CardActionArea,
+  CircularProgress,
 } from "@mui/material";
 import { fontArray } from "../theme/theme";
 import { Search } from "@mui/icons-material";
@@ -60,12 +61,14 @@ export type SearchFieldProps = {
   input: string;
   setInput: (it: string) => void;
   handleSearch: () => void;
+  disabled: boolean;
 };
 
 export const SearchField = ({
   input,
   setInput,
   handleSearch,
+  disabled,
 }: SearchFieldProps) => {
   const onEnter = (evt: React.KeyboardEvent) => {
     if (evt.key === "Enter") {
@@ -80,18 +83,25 @@ export const SearchField = ({
         placeholder="Search now..."
         multiline
         value={input}
+        disabled={disabled}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={onEnter}
         endAdornment={
           <SearchInputIconContainer position="end">
-            <IconButton
-              aria-label="send chat"
-              edge="end"
-              onClick={handleSearch}
-              disabled={input && input.length == 0 ? true : false}
-            >
-              <Search />
-            </IconButton>
+            {disabled ? (
+              <CircularProgress size={20} />
+            ) : (
+              <IconButton
+                aria-label="send chat"
+                edge="end"
+                onClick={handleSearch}
+                disabled={
+                  disabled || !input || input.length == 0 ? true : false
+                }
+              >
+                <Search />
+              </IconButton>
+            )}
           </SearchInputIconContainer>
         }
       />

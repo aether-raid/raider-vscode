@@ -91,10 +91,16 @@ export const Search = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<Codebase[]>([]);
 
+  const [disabled, setDisabled] = useState(false);
+
   const search = async () => {
-    let results = await callApi("search", searchText);
-    console.log(results);
-    setSearchResults(results);
+    if (searchText && searchText.length > 0) {
+      setDisabled(true);
+      let results = await callApi("search", searchText);
+      setDisabled(false);
+      console.log(results);
+      setSearchResults(results);
+    }
   };
 
   return (
@@ -103,6 +109,7 @@ export const Search = () => {
         input={searchText}
         setInput={setSearchText}
         handleSearch={search}
+        disabled={disabled}
       />
       <SearchResultContainer>
         {searchResults.map((result, index) => (
