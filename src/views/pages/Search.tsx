@@ -98,7 +98,7 @@ export const Search = () => {
       setDisabled(true);
       let results = await callApi("search", searchText);
       setDisabled(false);
-      console.log(results);
+      console.log(`raider-chat web-raider search results (client): ${results}`);
       setSearchResults(results);
     }
   };

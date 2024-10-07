@@ -32,38 +32,7 @@ interface Session {
 export const History = () => {
   const { callApi } = useContext(WebviewContext);
 
-  const [sessions, setSessions] = useState<Session[]>([
-    // {
-    //   id: "0",
-    //   messages: [
-    //     {
-    //       role: "user",
-    //       content: "why is this error caused",
-    //     },
-    //   ],
-    //   lastUpdated: new Date(2024, 8, 16, 16, 30),
-    // },
-    // {
-    //   id: "1",
-    //   messages: [
-    //     {
-    //       role: "user",
-    //       content: "what is the reason for this existing",
-    //     },
-    //   ],
-    //   lastUpdated: new Date(2024, 8, 16, 12, 30),
-    // },
-    // {
-    //   id: "2",
-    //   messages: [
-    //     {
-    //       role: "user",
-    //       content: "what is going on here dude",
-    //     },
-    //   ],
-    //   lastUpdated: new Date(2024, 8, 16, 8, 30),
-    // },
-  ]);
+  const [sessions, setSessions] = useState<Session[]>([]);
 
   useEffect(() => {
     const fetchSessions = async () => {
