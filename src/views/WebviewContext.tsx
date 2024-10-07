@@ -22,6 +22,7 @@ type CallAPI = <K extends keyof ViewApi>(
   key: K,
   ...params: Parameters<ViewApi[K]>
 ) => Promise<ReturnType<ViewApi[K]>>;
+
 type AddRemoveListener = <K extends keyof ViewEvents>(
   key: K,
   cb: (...params: Parameters<ViewEvents[K]>) => void
@@ -40,6 +41,29 @@ export const webviewContextValue = (
   const onMessage = (e: MessageEvent<Record<string, unknown>>) => {
     if (e.data.type === "response") {
       const data = e.data as ViewApiResponse;
+
+      if (data.isStreaming) {
+        let promise = pendingRequests[data.id];
+
+        promise.resolve(async function* () {
+          yield data.value;
+
+          if (data.isLast) return;
+
+          let deferred = new DeferredPromise<AsyncGenerator<unknown>>();
+          pendingRequests[data.id] = deferred;
+          let g = await deferred.promise;
+
+          // Promise.race([deferred.promise, new Promise((resolve, reject) => {
+          //   setTimeout(resolve, 1000)
+          // })])
+
+          for await (let i of g) {
+            yield i;
+          }
+        });
+      }
+
       pendingRequests[data.id].resolve(data.value);
     } else if (e.data.type === "error") {
       const data = e.data as ViewApiError;
