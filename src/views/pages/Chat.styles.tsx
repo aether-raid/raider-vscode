@@ -7,12 +7,19 @@ import {
   InputAdornment,
   OutlinedInput,
   IconButton,
+  Card,
+  CardContent,
+  CardActionArea,
+  Typography,
+  Grow,
 } from "@mui/material";
 import { Message } from "../types";
 import { ThemeButton, fontArray } from "../theme/theme";
-import { SendOutlined } from "@mui/icons-material";
+import { Check, PlayArrowOutlined, SendOutlined } from "@mui/icons-material";
 import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "../WebviewContext";
+import { md, Markdown } from "../util/markdown";
+import MarkdownIt from "markdown-it";
 
 export type ChatBubbleProps = {
   role: string;
@@ -25,7 +32,7 @@ export const roleColors = {
 // #007acc
 
 function getRoleColor(role: string) {
-  return Object.entries(roleColors).find(([key, /*val*/]) => key === role)?.[1];
+  return Object.entries(roleColors).find(([key /*val*/]) => key === role)?.[1];
 }
 
 export const ChatBubbleContainer = styled.div<ChatBubbleProps>`
@@ -41,33 +48,45 @@ export const ChatBubbleContainer = styled.div<ChatBubbleProps>`
     props.role === "user" ? "5px" : "0px"};
   white-space: pre-line;
   font-family: ${fontArray};
+
+  & > ul,
+  ol {
+    margin-left: 20px;
+  }
 `;
 
 export class MessageBubbleProps {
   message!: Message;
   html?: boolean = true; // set false for debugging
+  render?: boolean = true;
 }
 
 export const MessageBubble = (props: MessageBubbleProps) => {
-  const { callApi } = useContext(WebviewContext);
+  // const { callApi } = useContext(WebviewContext);
   const [text, setText] = useState(props.message.content);
 
-  useEffect(() => {
-    async function render(text: string) {
-      let renderedText = (await callApi("renderMarkdown", text.trim())).trim();
-      setText(renderedText.replace(/^<[^>]+>|<\/[^>]+>$/gi, ""));
-    }
+  if (props.render) {
+    useEffect(() => {
+      async function render(text: string) {
+        let renderedText = md.render(text.trim()).trim();
 
-    render(props.message.content);
+        // let renderedText = (await callApi("renderMarkdown", text.trim())).trim();
+        setText(renderedText); //.replace(/^<[^>]+>|<\/[^>]+>$/gi, ""));
+      }
 
-    let interval = setInterval(() => {
-      render(props.message.content);
-    }, 10000);
+      if (typeof props.message.content === "string") {
+        render(props.message.content);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+        // let interval = setInterval(() => {
+        //   render(props.message.content);
+        // }, 10000);
+
+        // return () => {
+        //   clearInterval(interval);
+        // };
+      }
+    }, []);
+  }
   return true ? (
     <ChatBubbleContainer
       role={props.message.role}
@@ -230,3 +249,92 @@ export const SendButton = styled(ThemeButton)`
     background-color: #005a9e;
   }
 `;
+
+export const SubtaskCardElem = styled(Card)`
+  max-width: 100%;
+  color: white;
+  background-color: #000053;
+  margin: 10px 10px;
+  border-radius: 10px;
+  white-space: pre-line;
+`;
+
+export const SubtaskCardActionArea = styled(CardActionArea)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const SubtaskCardMenu = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
+`;
+
+export class SubtaskCardProps {
+  subtask!: {
+    task_body: string;
+    task_type: string;
+  };
+  run?: (subtask: { task_body: string; task_type: string }) => void = (_) => {};
+}
+
+export const SubtaskCard = (props: SubtaskCardProps) => {
+  const [ran, setRan] = useState(false);
+
+  const [showRun, setRun] = useState(false);
+
+  const [markdown, setMarkdown] = useState<MarkdownIt>(md);
+
+  const handleRun = () => {
+    if (props.run) {
+      props.run(props.subtask);
+      setRan(true);
+    }
+  };
+
+  // useEffect(() => {
+  //   (async () => {
+  //     setMarkdown(await Markdown());
+  //   })();
+  // }, []);
+
+  return (
+    <SubtaskCardElem
+      onMouseOver={() => setRun(true)}
+      onMouseOut={() => setRun(false)}
+    >
+      <SubtaskCardActionArea onClick={handleRun}>
+        <CardContent
+          dangerouslySetInnerHTML={{
+            __html: markdown.render(props.subtask.task_body),
+          }}
+        />
+        <SubtaskCardMenu>
+          {showRun && (
+            <IconButton
+              size="large"
+              sx={{ marginBottom: "auto", marginTop: "auto" }}
+              onClick={handleRun}
+              color={"success"}
+            >
+              {!ran ? (
+                <Grow in={!ran}>
+                  <PlayArrowOutlined />
+                </Grow>
+              ) : (
+                <Grow in={ran}>
+                  <Check />
+                </Grow>
+              )}
+            </IconButton>
+          )}
+        </SubtaskCardMenu>
+      </SubtaskCardActionArea>
+    </SubtaskCardElem>
+  );
+};

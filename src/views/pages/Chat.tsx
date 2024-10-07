@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
+import ReactDOMServer, { renderToString } from "react-dom/server";
 // import { useRef } from "react";
 import { WebviewContext } from "../WebviewContext";
 import {
@@ -11,13 +12,15 @@ import {
   // CloseChatButton,
   MessageBubble,
   MessagesContainer,
+  SubtaskCard,
   // SendButton,
 } from "./Chat.styles";
 import { Message } from "../types";
-import { Fab } from "@mui/material";
+import { Box, Card, CardContent, Fab } from "@mui/material";
 import {
   /* Replay, RotateLeft, */ RotateLeftOutlined,
 } from "@mui/icons-material";
+import { md } from "../util/markdown";
 // import {
 //   ChatBubbleOutlineOutlined,
 //   KeyboardDoubleArrowRight,
@@ -33,9 +36,36 @@ export const Chat = () => {
 
   // const [isStreaming, setIsStreaming] = useState(false);
 
-  const addChatBubble = (content: string, role: string) => {
-    setMessages((prevMessages) => [...prevMessages, { content, role }]);
-    callApi("sendMessage", { content, role });
+  const addChatBubble = (
+    content: string, //| ReactElement,
+    role: string,
+    flag: any | undefined = undefined
+    // isHtml: boolean = false
+  ) => {
+    setMessages((prevMessages) => [...prevMessages, { content, role, flag }]);
+    callApi("sendMessage", {
+      content, //: typeof content === "string" ? content : renderToString(content),
+      role,
+    });
+  };
+
+  const updateLastMessage = (content: string) => {
+    setMessages((prevMessages) => {
+      let lastMessage = prevMessages.pop();
+
+      if (lastMessage) {
+        // lastMessage["content"] = lastMessage.content + content;
+        return [
+          ...prevMessages,
+          {
+            content: lastMessage.content + content,
+            role: lastMessage.role,
+          },
+        ];
+      } else {
+        return [...prevMessages, { content, role: "assistant" }];
+      }
+    });
   };
 
   const handleSend = async () => {
@@ -49,6 +79,11 @@ export const Chat = () => {
         (it) => it.task_type !== "User action"
       );
 
+      // let subtasks = [
+      //   { task_body: "This is a test subtask", task_type: "User action" },
+      //   { task_body: "This is a test subtask", task_type: "User action" },
+      // ];
+
       if (subtasks.length === 0) {
         addChatBubble(
           "RAiDer was unable to formulate a plan based on the provided codebase and prompt. This most likely means that the functionality is already implemented and is hence unnecessary for us to update.",
@@ -57,21 +92,53 @@ export const Chat = () => {
         return;
       }
 
-      let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
-        .map((value, idx) => `${idx + 1}. ${value.task_body}`)
-        .join("\n")}\n`;
-      addChatBubble(subtaskGeneration, "assistant");
+      // let subtaskBubble = //renderToString(
+      //   (
+      //     <Box>
+      //       Generated Subtasks:
+      //       <ul>
+      //         {subtasks.map((value, idx) => (
+      //           // <Card key={idx}>
+      //           //   <CardContent
+      //           //     dangerouslySetInnerHTML={{
+      //           //       __html: md.render(value.task_body),
+      //           //     }}
+      //           //   />
+      //           // </Card>
+      //           <SubtaskCard subtask={value} key={idx} />
+      //         ))}
+      //       </ul>
+      //     </Box>
+      //   );
+      //);
 
-      // for(let subtask of subtasks) {
-      //   let result = await callApi("runSubtask", subtask.task_body);
-      //   addChatBubble(result, "assistant");
-      // }
+      let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
+        .map(
+          (value, idx) =>
+            `${idx + 1}. ${value.task_body.replace("\n- ", "\n\t-")}`
+        )
+        .join("\n")}\n`;
+      addChatBubble(
+        // subtaskBubble,
+        subtaskGeneration,
+        "assistant"
+      );
+
+      for (let i = 0; i < subtasks.length; i++) {
+        addChatBubble(`## Running Subtask ${i + 1}`, "assistant");
+        // addChatBubble("", "assistant");
+        addListener("sendChunk", updateLastMessage);
+        let result = await callApi("runSubtask", subtasks[i].task_body);
+        removeListener("sendChunk", updateLastMessage);
+        addChatBubble(result, "assistant");
+      }
 
       // let response =
-      // let g = await callApi("sendMessage", {
-      //   role: "user",
-      //   content: prompt,
-      // });
+
+      // addChatBubble("Running Subtask");
+      // addListener("sendChunk", updateLastMessage);
+
+      // let g = await callApi("runSubtask", subtasks[0].task_body);
 
       // console.log(
       //   `raider-chat ${g} ${typeof g} ${JSON.stringify(
@@ -137,7 +204,11 @@ export const Chat = () => {
     <ChatContainer>
       <MessagesContainer>
         {messages.map((msg, index) => (
-          <MessageBubble message={msg} key={index} />
+          <MessageBubble
+            message={msg}
+            key={index}
+            render={!("isHtml" in msg && msg.isHtml)}
+          />
         ))}
       </MessagesContainer>
       <ChatField input={input} setInput={setInput} handleSend={handleSend} />
