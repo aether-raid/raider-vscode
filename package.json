@@ -44,7 +44,26 @@
     "uuid": "^9.0.1",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^4.15.1",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource-variable/inter": "^5.0.21",
+    "@fontsource/roboto": "^5.1.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "@mui/styled-engine-sc": "^6.1.1",
+    "@shikijs/markdown-it": "^1.21.1",
+    "axios": "^1.7.4",
+    "bufferutil": "^4.0.8",
+    "highlight.js": "^11.10.0",
+    "markdown-it": "^14.1.0",
+    "marked": "^14.1.2",
+    "raider-chat": "file:",
+    "react-icons": "^5.3.0",
+    "shiki": "^1.21.1",
+    "styled-components": "^6.1.13",
+    "utf-8-validate": "^6.0.4",
+    "ws": "^8.18.0"
   },
   "contributes": {
     "commands": [
@@ -134,25 +153,5 @@
       ]
     }
   },
-  "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@fontsource-variable/inter": "^5.0.21",
-    "@fontsource/roboto": "^5.1.0",
-    "@mui/icons-material": "^5.16.7",
-    "@mui/material": "^5.16.7",
-    "@mui/styled-engine-sc": "^6.1.1",
-    "@shikijs/markdown-it": "^1.21.1",
-    "axios": "^1.7.4",
-    "bufferutil": "^4.0.8",
-    "highlight.js": "^11.10.0",
-    "markdown-it": "^14.1.0",
-    "marked": "^14.1.2",
-    "raider-chat": "file:",
-    "react-icons": "^5.3.0",
-    "shiki": "^1.21.1",
-    "styled-components": "^6.1.13",
-    "utf-8-validate": "^6.0.4",
-    "ws": "^8.18.0"
-  }
+  "dependencies": {}
 }
