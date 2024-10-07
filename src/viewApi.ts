@@ -9,6 +9,8 @@ export type ViewApiResponse = {
   type: "response";
   id: string;
   value: unknown;
+  isStreaming?: boolean;
+  isLast?: boolean;
 };
 
 export type ViewApiError = {
@@ -51,6 +53,8 @@ export type ViewApi = {
   // showExampleViewB: () => void;
   // sendMessageToExampleB: (msg: string) => void;
   sendMessage: (msg: Message) => Promise<void>;
+
+  updateLastMessage: (content: string) => Promise<void>;
 
   generateSubtasks: (objective: string) => Promise<Subtask[]>;
   runSubtask: (task: string) => Promise<string>;
@@ -95,4 +99,5 @@ export type ViewEvents = {
     page: "chat" | "history" | "codebases" | "settings" | "search"
   ) => void;
   disconnectServer: () => void;
+  sendChunk: (chunk: string) => void;
 };

@@ -34,30 +34,6 @@ export class LocalCodebase extends Codebase {
   constructor(uri: string | LocalCodebase) {
     super(typeof uri === "string" ? uri : uri.uri, "local");
   }
-
-  // async hasGit(): Promise<boolean> {
-  //   return await exists(path.join(this.uri, ".git"));
-  // }
-
-  // async initGit() {
-  //   if (!(await this.hasGit())) {
-  //     cp.exec(
-  //       `git init`,
-  //       {
-  //         cwd: this.uri,
-  //       },
-  //       (err, stdout, stderr) => {
-  //         if (err) {
-  //           console.log(err);
-  //           return false;
-  //         }
-  //         console.log(stdout);
-  //         console.log(stderr);
-  //         return true;
-  //       }
-  //     );
-  //   }
-  // }
 }
 
 export type CodebaseManagerData = {
@@ -116,7 +92,6 @@ export class CodebaseManager {
   }
 
   async add(uri: string) {
-    console.log(`raider: I tried to add a repo ${uri}`);
     let codebase = new LocalCodebase(uri);
     await this.backendInstance.initExternalRepo(codebase.uri);
     this.codebases.push(codebase);

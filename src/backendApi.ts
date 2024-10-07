@@ -1,5 +1,6 @@
 import WebSocket, { RawData } from "ws";
 import { v4 as uuidv4 } from "uuid";
+import DeferredPromise from "promise-deferred";
 
 export type InitAgentManagerParams = {
   timeout?: number;
@@ -78,7 +79,7 @@ export class Backend {
 
   currentGeneration: string = "";
 
-  currentPromise: Promise<string> | null = null;
+  currentPromise: DeferredPromise.Deferred<string> | null = null;
 
   onCloseAction: () => void = () => {};
 
@@ -115,7 +116,7 @@ export class Backend {
       this.onClose(_self);
     });
     this.ws.on("message", (data: RawData) => {
-      console.log(`raider-chat 0: ${data}`);
+      // console.log(`raider-chat 0: ${data}`);
 
       function processData(data: any) {
         return JSON.parse(
@@ -131,56 +132,53 @@ export class Backend {
     });
   }
 
-  createPromise(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      setInterval(() => {
-        if (!this.expectingResponse && !this.responding) {
-          let generation = this.currentGeneration;
-          this.currentGeneration = "";
-          resolve(generation);
-        }
-      }, 1000);
-    });
+  createPromise(): DeferredPromise.Deferred<string> {
+    return new DeferredPromise<string>();
+
+    // return new Promise<string>((resolve, reject) => {
+    //   let interval = setInterval(() => {
+    //     if (!this.expectingResponse && !this.responding) {
+    //       let generation = this.currentGeneration;
+    //       this.currentGeneration = "";
+    //       console.log(`raider-chat stopping, generated ${generation}`);
+    //       resolve(generation);
+    //       clearInterval(interval);
+    //     }
+    //   }, 500);
+    // });
   }
 
   processMessage(self: this, message: any) {
-    console.log(
-      `raider-chat 3: ${message} ${Object.getOwnPropertyNames(
-        message
-      )} ${typeof message}`
-    );
-
-    let propertyNames = Object.getOwnPropertyNames(message);
-    propertyNames.forEach((value) => {
-      console.log(`raider-chat 3: ${value} ${message[value]}`);
-    });
-
     if ("<PING>" in message) {
-      console.log("raider-chat pinged");
+      // console.log("raider-chat pinged");
       return;
     }
+
     // if (isEquivalent(message, keepAlivePing)) return;
     if ("<END_OF_MESSAGE>" in message) {
       //|| isEquivalent(message, endOfMessageResponse)) {
-      console.log("raider-chat end of message hit woohoo");
-      console.log(`raider-chat generated shit malig ${self.currentGeneration}`);
+      // console.log("raider-chat end of message hit woohoo");
+      console.log(
+        `raider-chat end of message generated ${self.currentGeneration}`
+      );
       self.responding = false;
       self.expectingResponse = false;
+
+      let generation = self.currentGeneration;
+      self.currentGeneration = "";
+      self.currentPromise?.resolve(generation);
       return;
     }
 
-    console.log("raider-chat it survived! it SURVIVED!!!!!!!!!!!!");
+    console.log(
+      `raider-chat 3: ${message} ${Object.getOwnPropertyNames(
+        message
+      )} ${typeof message} ${JSON.stringify(message)}`
+    );
 
     self.responding = true;
 
     self.onMessageAction(self, message);
-
-    // if ("error" in message) {
-    //   self.currentGeneration = message["error"] as string;
-    // } else if ("result" in message) {
-    //   console.log(`messaging ${message["result"]} ${typeof message["result"]}`);
-    //   self.currentGeneration = JSON.stringify(message["result"]);
-    // }
   }
 
   async sendMsg(
@@ -202,7 +200,7 @@ export class Backend {
     );
     this.expectingResponse = true;
     this.currentPromise = this.createPromise();
-    return await this.currentPromise;
+    return await this.currentPromise.promise;
   }
 
   async initAgentManager(timeout: number = 60) {
@@ -216,7 +214,6 @@ export class Backend {
     modelName: string = "azure/gpt4o",
     timeout: number = 60
   ) {
-    console.log(`raider init external repo ${repoDir}`);
     await this.sendMsg("init_external_repo_agent", {
       repo_dir: repoDir,
       model_name: modelName,
@@ -232,9 +229,6 @@ export class Backend {
         if ("error" in message) {
           self.currentGeneration = JSON.stringify(message["error"]);
         } else if ("result" in message) {
-          console.log(
-            `messaging ${message["result"]} ${typeof message["result"]}`
-          );
           self.currentGeneration = JSON.stringify(message["result"]);
         }
       }
@@ -260,19 +254,16 @@ export class Backend {
       { user_query },
       (self, message) => {
         if ("error" in message) {
-          self.currentGeneration = JSON.stringify(message["error"]);
+          self.currentGeneration += JSON.stringify(message["error"]);
         } else if ("result" in message) {
-          console.log(
-            `messaging ${message["result"]} ${typeof message["result"]}`
-          );
-          self.currentGeneration = JSON.stringify(message["result"]);
+          self.currentGeneration += JSON.stringify(message["result"]);
         }
       }
     );
     console.log(
-      `${response} ${typeof response} ${JSON.stringify(response)} ${JSON.parse(
-        response || "[]"
-      )}`
+      `raider-chat web-raider response ${response} ${typeof response} ${JSON.stringify(
+        response
+      )} ${JSON.parse(response || "[]")}`
     );
     return JSON.parse(response || "[]") as WebRaiderResult[];
   }
@@ -285,9 +276,6 @@ export class Backend {
         if ("error" in message) {
           self.currentGeneration = JSON.stringify(message["error"]);
         } else if ("result" in message) {
-          console.log(
-            `messaging ${message["result"]} ${typeof message["result"]}`
-          );
           self.currentGeneration = JSON.stringify(message["result"]);
         }
       }
@@ -303,11 +291,8 @@ export class Backend {
       if ("error" in message) {
         self.currentGeneration += JSON.stringify(message["error"]);
       } else if ("result" in message) {
-        console.log(
-          `messaging ${message["result"]} ${typeof message["result"]}`
-        );
-        self.currentGeneration += JSON.stringify(message["result"]);
-        onChunk(JSON.stringify(message["result"]));
+        self.currentGeneration += message["result"];
+        onChunk(message["result"]);
       }
     });
   }

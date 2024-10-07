@@ -15,7 +15,8 @@ import {
 import { SessionManager } from "./sessionManager";
 import { CodebaseManager } from "./codebaseManager";
 import { Backend } from "./backendApi";
-import { shuffle } from "./util";
+import DeferredPromise from "promise-deferred";
+// import { shuffle } from "./util";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
@@ -38,10 +39,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       } as ViewApiEvent<E>);
     });
   };
-
-  console.log("raider: ", ctx.storageUri || "no uri???");
-  console.log("raider: ", ctx.storageUri?.path || "no path???");
-  console.log("raider: ", ctx.storageUri?.fsPath || "no fspath???");
 
   const backend = new Backend(
     vscode.workspace.workspaceFolders
@@ -70,10 +67,38 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       return subtasks;
     },
 
-    runSubtask: async function (subtask) {
-      return backend.runSubtask(subtask, (chunk) => {
-        sessionManager.getCurrentSession().updateLastResponse(chunk);
+    runSubtask: async (subtask) => {
+      return await backend.runSubtask(subtask, (chunk) => {
+        triggerEvent("sendChunk", chunk);
       });
+    },
+
+    // runSubtask: async function* (subtask) {
+    //   // yield "Running Subtask...";
+
+    //   let currentPromise: DeferredPromise.Deferred<string> | null =
+    //     new DeferredPromise<string>();
+
+    //   backend
+    //     .runSubtask(subtask, (chunk) => {
+    //       sessionManager.getCurrentSession().updateLastResponse(chunk);
+    //       triggerEvent("sendChunk", chunk);
+    //       currentPromise?.resolve(chunk);
+    //       currentPromise = new DeferredPromise<string>();
+    //     })
+    //     .then((final) => {
+    //       sessionManager.getCurrentSession().updateLastResponse(final);
+    //       currentPromise = null;
+    //     });
+
+    //   while (currentPromise !== null) {
+    //     yield await currentPromise.promise;
+    //   }
+    // },
+
+    updateLastMessage: async function (content: string) {
+      sessionManager.getCurrentSession().updateLastResponse(content);
+      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
 
     sendMessage: async function (msg: Message) {
@@ -155,13 +180,11 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
     newSession: () => {
-      console.log("new session???");
       triggerEvent("showPage", "chat");
       currentPage = "chat";
       sessionManager.openSession();
     },
     deleteSession: (sessionId: string) => {
-      console.log("delete", sessionId);
       sessionManager.deleteSession(sessionId);
       triggerEvent("sendHistory", sessionManager.export());
     },
@@ -240,7 +263,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     },
 
     openInNewWindow: (dir: string) => {
-      console.log("raider: open in new window", dir);
       vscode.commands.executeCommand(
         "vscode.openFolder",
         vscode.Uri.file(dir),
@@ -277,14 +299,50 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
         return;
       }
       try {
-        // @ts-expect-error
-        const val = await Promise.resolve(api[msg.key](...msg.params));
-        const res: ViewApiResponse = {
-          type: "response",
-          id: msg.id,
-          value: val,
-        };
-        view.webview.postMessage(res);
+        const apiFunc: Function = api[msg.key];
+
+        const AsyncGeneratorFunction = async function* () {}.constructor;
+
+        // console.log(`${msg.key} ${apiFunc instanceof AsyncGeneratorFunction}`);
+
+        if (apiFunc instanceof AsyncGeneratorFunction) {
+          const generator = apiFunc(...msg.params);
+
+          for await (let val of generator) {
+            const res: ViewApiResponse = {
+              type: "response",
+              id: msg.id,
+              value: val,
+              isStreaming: true,
+              isLast: false,
+            };
+
+            view.webview.postMessage(res);
+          }
+
+          view.webview.postMessage({
+            type: "response",
+            id: msg.id,
+            value: "",
+            isStreaming: true,
+            isLast: true,
+          });
+        } else {
+          // @ts-expect-error
+          const val = await Promise.resolve(api[msg.key](...msg.params));
+          // console.log(
+          //   `raider-chat sending out message for ${
+          //     msg.key
+          //   } with item ${JSON.stringify(val)}`
+          // );
+          const res: ViewApiResponse = {
+            type: "response",
+            id: msg.id,
+            value: val,
+            isStreaming: false,
+          };
+          view.webview.postMessage(res);
+        }
       } catch (e: unknown) {
         const err: ViewApiError = {
           type: "error",
@@ -300,13 +358,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   };
 
   registerAndConnectView("raiderChat");
-  // registerAndConnectView("raiderTerminal");
-
-  // vscode.commands.registerCommand("raider.reset", () => {
-  //   sessionManager.getCurrentSession().reset();
-  //   console.log("raider.reset called");
-  //   triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
-  // });
 
   vscode.commands.registerCommand("raider.new", () => {
     triggerEvent("showPage", "chat");
@@ -321,7 +372,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   pages.forEach((page) => {
     vscode.commands.registerCommand(`raider.${page}`, () => {
       console.log(`raider.${page} called`);
-      console.log(page, "cooked");
       if (backend.isOpen) {
         triggerEvent("showPage", page);
         currentPage = page;

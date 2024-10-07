@@ -103,7 +103,7 @@ export class Session {
 
   updateLastResponse(content: string) {
     let message = this.messages.pop() || { role: "assistant", content: "" };
-    message.content = content;
+    message.content += content;
     this.messages.push(message);
   }
 
