@@ -72,66 +72,71 @@ export const Chat = () => {
     if (input.trim()) {
       let prompt = input.trim();
       addChatBubble(prompt, "user");
-      addChatBubble("Thinking...\n\n", "assistant");
+      addChatBubble("Thinking...", "assistant");
       setInput("");
 
-      let subtasks = (await callApi("generateSubtasks", prompt)).filter(
-        (it) => it.task_type !== "User action"
-      );
+      addListener("sendChunk", updateLastMessage);
+      let result = await callApi("askRepo", prompt);
+      removeListener("sendChunk", updateLastMessage);
+      addChatBubble(result, "assistant");
 
-      // let subtasks = [
-      //   { task_body: "This is a test subtask", task_type: "User action" },
-      //   { task_body: "This is a test subtask", task_type: "User action" },
-      // ];
+      // let subtasks = (await callApi("generateSubtasks", prompt)).filter(
+      //   (it) => it.task_type !== "User action"
+      // );
 
-      if (subtasks.length === 0) {
-        addChatBubble(
-          "RAiDer was unable to formulate a plan based on the provided codebase and prompt. This most likely means that the functionality is already implemented and is hence unnecessary for us to update.",
-          "assistant"
-        );
-        return;
-      }
+      // // let subtasks = [
+      // //   { task_body: "This is a test subtask", task_type: "User action" },
+      // //   { task_body: "This is a test subtask", task_type: "User action" },
+      // // ];
 
-      // let subtaskBubble = //renderToString(
-      //   (
-      //     <Box>
-      //       Generated Subtasks:
-      //       <ul>
-      //         {subtasks.map((value, idx) => (
-      //           // <Card key={idx}>
-      //           //   <CardContent
-      //           //     dangerouslySetInnerHTML={{
-      //           //       __html: md.render(value.task_body),
-      //           //     }}
-      //           //   />
-      //           // </Card>
-      //           <SubtaskCard subtask={value} key={idx} />
-      //         ))}
-      //       </ul>
-      //     </Box>
+      // if (subtasks.length === 0) {
+      //   addChatBubble(
+      //     "RAiDer was unable to formulate a plan based on the provided codebase and prompt. This most likely means that the functionality is already implemented and is hence unnecessary for us to update.",
+      //     "assistant"
       //   );
-      //);
+      //   return;
+      // }
 
-      let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
-        .map(
-          (value, idx) =>
-            `${idx + 1}. ${value.task_body.replace("\n- ", "\n\t-")}`
-        )
-        .join("\n")}\n`;
-      addChatBubble(
-        // subtaskBubble,
-        subtaskGeneration,
-        "assistant"
-      );
+      // // let subtaskBubble = //renderToString(
+      // //   (
+      // //     <Box>
+      // //       Generated Subtasks:
+      // //       <ul>
+      // //         {subtasks.map((value, idx) => (
+      // //           // <Card key={idx}>
+      // //           //   <CardContent
+      // //           //     dangerouslySetInnerHTML={{
+      // //           //       __html: md.render(value.task_body),
+      // //           //     }}
+      // //           //   />
+      // //           // </Card>
+      // //           <SubtaskCard subtask={value} key={idx} />
+      // //         ))}
+      // //       </ul>
+      // //     </Box>
+      // //   );
+      // //);
 
-      for (let i = 0; i < subtasks.length; i++) {
-        addChatBubble(`## Running Subtask ${i + 1}`, "assistant");
-        // addChatBubble("", "assistant");
-        addListener("sendChunk", updateLastMessage);
-        let result = await callApi("runSubtask", subtasks[i].task_body);
-        removeListener("sendChunk", updateLastMessage);
-        addChatBubble(result, "assistant");
-      }
+      // let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
+      //   .map(
+      //     (value, idx) =>
+      //       `${idx + 1}. ${value.task_body.replace("\n- ", "\n\t-")}`
+      //   )
+      //   .join("\n")}\n`;
+      // addChatBubble(
+      //   // subtaskBubble,
+      //   subtaskGeneration,
+      //   "assistant"
+      // );
+
+      // for (let i = 0; i < subtasks.length; i++) {
+      //   addChatBubble(`## Running Subtask ${i + 1}`, "assistant");
+      //   // addChatBubble("", "assistant");
+      //   addListener("sendChunk", updateLastMessage);
+      //   let result = await callApi("runSubtask", subtasks[i].task_body);
+      //   removeListener("sendChunk", updateLastMessage);
+      //   addChatBubble(result, "assistant");
+      // }
 
       // let response =
 

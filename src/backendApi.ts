@@ -20,6 +20,10 @@ export type RunSubtaskParams = {
   subtask: string;
 };
 
+export type AskRepoParams = {
+  query: string;
+};
+
 export type ToggleExternalRepoParams = {
   agent_id: string;
 };
@@ -34,6 +38,7 @@ export type RequestMethod =
   | "get_external_repo_agents"
   | "generate_subtasks"
   | "run_subtask"
+  | "ask_repo"
   | "generate_commands"
   | "disable_external_repo_agent"
   | "enable_external_repo_agent"
@@ -46,6 +51,7 @@ export type RequestParams =
   | InitExternalRepoParams
   | GenerateSubtasksParams
   | RunSubtaskParams
+  | AskRepoParams
   | ToggleExternalRepoParams
   | WebRaiderQueryParams;
 
@@ -288,6 +294,20 @@ export class Backend {
     onChunk: (chunk: string) => void = () => {}
   ): Promise<string> {
     return await this.sendMsg("run_subtask", { subtask }, (self, message) => {
+      if ("error" in message) {
+        self.currentGeneration += JSON.stringify(message["error"]);
+      } else if ("result" in message) {
+        self.currentGeneration += message["result"];
+        onChunk(message["result"]);
+      }
+    });
+  }
+
+  async askRepo(
+    query: string,
+    onChunk: (chunk: string) => void = () => {}
+  ): Promise<string> {
+    return await this.sendMsg("ask_repo", { query }, (self, message) => {
       if ("error" in message) {
         self.currentGeneration += JSON.stringify(message["error"]);
       } else if ("result" in message) {

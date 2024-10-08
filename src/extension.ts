@@ -73,6 +73,14 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       });
     },
 
+    askRepo: async (query) => {
+      let resp = await backend.askRepo(query, (chunk) => {
+        triggerEvent("sendChunk", chunk);
+      });
+      console.log(`raider-chat asked repo and got ${resp}`);
+      return resp;
+    },
+
     // runSubtask: async function* (subtask) {
     //   // yield "Running Subtask...";
 

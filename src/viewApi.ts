@@ -58,6 +58,7 @@ export type ViewApi = {
 
   generateSubtasks: (objective: string) => Promise<Subtask[]>;
   runSubtask: (task: string) => Promise<string>;
+  askRepo: (query: string) => Promise<string>;
 
   getMessages: () => Message[];
   getSessions: () => Session[];
