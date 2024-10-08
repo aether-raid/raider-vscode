@@ -73,6 +73,12 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       });
     },
 
+    askRepo: async (query) => {
+      return await backend.askRepo(query, (chunk) => {
+        triggerEvent("sendChunk", chunk);
+      });
+    },
+
     // runSubtask: async function* (subtask) {
     //   // yield "Running Subtask...";
 
