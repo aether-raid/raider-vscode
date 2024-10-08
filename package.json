@@ -1,15 +1,15 @@
 {
   "name": "raider-chat",
   "private": true,
-  "displayName": "Raider Chat Extension",
+  "displayName": "Raider Chat",
   "description": "Raid repos for code!",
-  "version": "1.2.2",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.92.0"
   },
   "tags": [],
   "categories": [],
-  "publisher": "example",
+  "publisher": "thepyprogrammer",
   "main": "extension.js",
   "scripts": {
     "bundle": "webpack --mode production && webpack --mode production --config ./webpack.config.views.js",
@@ -152,6 +152,5 @@
         }
       ]
     }
-  },
-  "dependencies": {}
+  }
 }
