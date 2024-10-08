@@ -3,7 +3,7 @@
   "private": true,
   "displayName": "Raider Chat",
   "description": "Raid repos for code!",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.92.0"
   },
