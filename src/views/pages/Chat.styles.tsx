@@ -1,31 +1,16 @@
 import styled from "@emotion/styled";
-import {
-  Button,
-  Box,
-  //Typography,
-  //TextField,
-  InputAdornment,
-  OutlinedInput,
-  IconButton,
-  Card,
-  CardContent,
-  CardActionArea,
-  Typography,
-  Grow,
-} from "@mui/material";
+import { Box, InputAdornment, OutlinedInput, IconButton } from "@mui/material";
 import { Message } from "../types";
-import { ThemeButton, fontArray } from "../theme/theme";
-import { Check, PlayArrowOutlined, SendOutlined } from "@mui/icons-material";
-import { useContext, useEffect, useState } from "react";
-import { WebviewContext } from "../WebviewContext";
-import { md, Markdown } from "../util/markdown";
-import MarkdownIt from "markdown-it";
+import { fontArray } from "../theme/theme";
+import { SendOutlined } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { md } from "../util/markdown";
 
-export type ChatBubbleProps = {
+type ChatBubbleProps = {
   role: string;
 };
 
-export const roleColors = {
+const roleColors = {
   assistant: "#fff0",
   user: "#313244",
 };
@@ -35,7 +20,7 @@ function getRoleColor(role: string) {
   return Object.entries(roleColors).find(([key /*val*/]) => key === role)?.[1];
 }
 
-export const ChatBubbleContainer = styled.div<ChatBubbleProps>`
+const ChatBubbleContainer = styled.div<ChatBubbleProps>`
   max-width: 100%;
   padding: 10px 10px;
   color: white;
@@ -55,88 +40,31 @@ export const ChatBubbleContainer = styled.div<ChatBubbleProps>`
   }
 `;
 
-export class MessageBubbleProps {
+class MessageBubbleProps {
   message!: Message;
   html?: boolean = true; // set false for debugging
-  render?: boolean = true;
 }
 
 export const MessageBubble = (props: MessageBubbleProps) => {
-  // const { callApi } = useContext(WebviewContext);
   const [text, setText] = useState(props.message.content);
 
-  if (props.render) {
-    useEffect(() => {
-      async function render(text: string) {
-        let renderedText = md.render(text.trim()).trim();
+  useEffect(() => {
+    async function render(text: string) {
+      let renderedText = md.render(text.trim()).trim();
+      setText(renderedText);
+    }
 
-        // let renderedText = (await callApi("renderMarkdown", text.trim())).trim();
-        setText(renderedText); //.replace(/^<[^>]+>|<\/[^>]+>$/gi, ""));
-      }
-
-      if (typeof props.message.content === "string") {
-        render(props.message.content);
-
-        // let interval = setInterval(() => {
-        //   render(props.message.content);
-        // }, 10000);
-
-        // return () => {
-        //   clearInterval(interval);
-        // };
-      }
-    }, []);
-  }
-  return true ? (
+    if (typeof props.message.content === "string") {
+      render(props.message.content);
+    }
+  }, []);
+  return (
     <ChatBubbleContainer
       role={props.message.role}
       dangerouslySetInnerHTML={{ __html: text }}
-    >
-      {/* <Typography fontFamily={fontArray}> */}
-      {/* {text} */}
-      {/* </Typography> */}
-    </ChatBubbleContainer>
-  ) : (
-    <ChatBubbleContainer role={props.message.role}>
-      {/* <Typography fontFamily={fontArray}> */}
-      {text}
-      {/* </Typography> */}
-    </ChatBubbleContainer>
+    ></ChatBubbleContainer>
   );
 };
-
-export const ChatHeader = styled(Box)`
-  position: sticky;
-  width: calc(100% - 0.75rem);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0.75rem 0.5rem;
-  border-bottom: 2px solid white;
-`;
-
-export const CloseChatButton = styled(IconButton)`
-  background-color: #2c2c2e;
-  color: #fdfdfd;
-`;
-
-export const ChatInfoContainer = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  margin: auto;
-  align-items: center;
-  color: #aeaeb2;
-`;
-
-export const ChatStatus = styled(Button)`
-  display: inline-flex;
-  align-items: center;
-  margin-left: 8px;
-  padding: 2px 8px;
-  background-color: #2c2c2e;
-  border-radius: 16px;
-  column-gap: 4px;
-`;
 
 export const ChatContainer = styled(Box)`
   display: flex;
@@ -146,14 +74,6 @@ export const ChatContainer = styled(Box)`
   padding: 0px;
   overflow: hidden;
 `;
-
-/**
- *   font-family: ${fontArray};
-  font-weight: 900;
-  font-style: normal;
-  font-size: 14px;
-  font-optical-sizing: auto;
- */
 
 export const MessagesContainer = styled(Box)`
   flex: 1;
@@ -166,14 +86,14 @@ export const MessagesContainer = styled(Box)`
   padding-bottom: 20px;
 `;
 
-export const ChatInputContainer = styled(Box)`
+const ChatInputContainer = styled(Box)`
   position: sticky;
   bottom: 0;
   margin-left: 10px;
   margin-right: 10px;
 `;
 
-export const ChatInput = styled(OutlinedInput)`
+const ChatInput = styled(OutlinedInput)`
   background-color: #313244;
   color: white;
   border: 1px solid #555;
@@ -188,13 +108,13 @@ export const ChatInput = styled(OutlinedInput)`
   }
 `;
 
-export type ChatFieldProps = {
+type ChatFieldProps = {
   input: string;
   setInput: (it: string) => void;
   handleSend: () => void;
 };
 
-export const ChatInputIconContainer = styled(InputAdornment)`
+const ChatInputIconContainer = styled(InputAdornment)`
   align-items: center;
   justify-content: bottom;
   display: flex;
@@ -234,107 +154,5 @@ export const ChatField = ({ input, setInput, handleSend }: ChatFieldProps) => {
         }
       />
     </ChatInputContainer>
-  );
-};
-
-export const SendButton = styled(ThemeButton)`
-  background-color: #007acc;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #005a9e;
-  }
-`;
-
-export const SubtaskCardElem = styled(Card)`
-  max-width: 100%;
-  color: white;
-  background-color: #000053;
-  margin: 10px 10px;
-  border-radius: 10px;
-  white-space: pre-line;
-`;
-
-export const SubtaskCardActionArea = styled(CardActionArea)`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
-export const SubtaskCardMenu = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  align-items: center;
-  justify-content: flex-end;
-  margin-left: auto;
-`;
-
-export class SubtaskCardProps {
-  subtask!: {
-    task_body: string;
-    task_type: string;
-  };
-  run?: (subtask: { task_body: string; task_type: string }) => void = (_) => {};
-}
-
-export const SubtaskCard = (props: SubtaskCardProps) => {
-  const [ran, setRan] = useState(false);
-
-  const [showRun, setRun] = useState(false);
-
-  const [markdown, setMarkdown] = useState<MarkdownIt>(md);
-
-  const handleRun = () => {
-    if (props.run) {
-      props.run(props.subtask);
-      setRan(true);
-    }
-  };
-
-  // useEffect(() => {
-  //   (async () => {
-  //     setMarkdown(await Markdown());
-  //   })();
-  // }, []);
-
-  return (
-    <SubtaskCardElem
-      onMouseOver={() => setRun(true)}
-      onMouseOut={() => setRun(false)}
-    >
-      <SubtaskCardActionArea onClick={handleRun}>
-        <CardContent
-          dangerouslySetInnerHTML={{
-            __html: markdown.render(props.subtask.task_body),
-          }}
-        />
-        <SubtaskCardMenu>
-          {showRun && (
-            <IconButton
-              size="large"
-              sx={{ marginBottom: "auto", marginTop: "auto" }}
-              onClick={handleRun}
-              color={"success"}
-            >
-              {!ran ? (
-                <Grow in={!ran}>
-                  <PlayArrowOutlined />
-                </Grow>
-              ) : (
-                <Grow in={ran}>
-                  <Check />
-                </Grow>
-              )}
-            </IconButton>
-          )}
-        </SubtaskCardMenu>
-      </SubtaskCardActionArea>
-    </SubtaskCardElem>
   );
 };

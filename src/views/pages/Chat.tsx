@@ -1,32 +1,14 @@
-import { ReactElement, useContext, useEffect, useState } from "react";
-import ReactDOMServer, { renderToString } from "react-dom/server";
-// import { useRef } from "react";
+import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "../WebviewContext";
 import {
   ChatContainer,
   ChatField,
-  // ChatHeader,
-  // ChatInfoContainer,
-  // ChatInput,
-  // ChatStatus,
-  // CloseChatButton,
   MessageBubble,
   MessagesContainer,
-  SubtaskCard,
-  // SendButton,
 } from "./Chat.styles";
 import { Message } from "../types";
-import { Box, Card, CardContent, Fab } from "@mui/material";
-import {
-  /* Replay, RotateLeft, */ RotateLeftOutlined,
-} from "@mui/icons-material";
-import { md } from "../util/markdown";
-// import {
-//   ChatBubbleOutlineOutlined,
-//   KeyboardDoubleArrowRight,
-//   RotateLeftOutlined,
-// } from "@mui/icons-material";
-// import { IconButton, Typography } from "@mui/material";
+import { Fab } from "@mui/material";
+import { RotateLeftOutlined } from "@mui/icons-material";
 
 export const Chat = () => {
   const { callApi, addListener, removeListener } = useContext(WebviewContext);
@@ -34,19 +16,13 @@ export const Chat = () => {
   const [messages, setMessages] = useState([] as Message[]);
   const [input, setInput] = useState("");
 
-  // const [isStreaming, setIsStreaming] = useState(false);
-
   const addChatBubble = (
-    content: string, //| ReactElement,
+    content: string,
     role: string,
     flag: any | undefined = undefined
-    // isHtml: boolean = false
   ) => {
     setMessages((prevMessages) => [...prevMessages, { content, role, flag }]);
-    callApi("sendMessage", {
-      content, //: typeof content === "string" ? content : renderToString(content),
-      role,
-    });
+    callApi("sendMessage", { content, role });
   };
 
   const updateLastMessage = (content: string) => {
@@ -54,7 +30,6 @@ export const Chat = () => {
       let lastMessage = prevMessages.pop();
 
       if (lastMessage) {
-        // lastMessage["content"] = lastMessage.content + content;
         return [
           ...prevMessages,
           {
@@ -97,26 +72,6 @@ export const Chat = () => {
       //   return;
       // }
 
-      // // let subtaskBubble = //renderToString(
-      // //   (
-      // //     <Box>
-      // //       Generated Subtasks:
-      // //       <ul>
-      // //         {subtasks.map((value, idx) => (
-      // //           // <Card key={idx}>
-      // //           //   <CardContent
-      // //           //     dangerouslySetInnerHTML={{
-      // //           //       __html: md.render(value.task_body),
-      // //           //     }}
-      // //           //   />
-      // //           // </Card>
-      // //           <SubtaskCard subtask={value} key={idx} />
-      // //         ))}
-      // //       </ul>
-      // //     </Box>
-      // //   );
-      // //);
-
       // let subtaskGeneration = `Generated Subtasks:\n\n${subtasks
       //   .map(
       //     (value, idx) =>
@@ -137,48 +92,6 @@ export const Chat = () => {
       //   removeListener("sendChunk", updateLastMessage);
       //   addChatBubble(result, "assistant");
       // }
-
-      // let response =
-
-      // addChatBubble("Running Subtask");
-      // addListener("sendChunk", updateLastMessage);
-
-      // let g = await callApi("runSubtask", subtasks[0].task_body);
-
-      // console.log(
-      //   `raider-chat ${g} ${typeof g} ${JSON.stringify(
-      //     g
-      //   )} ${Object.getOwnPropertyNames(g)}`
-      // );
-
-      // for await (const result of g) {
-      //   addChatBubble(result, "assistant");
-      // }
-
-      // console.log(`raider-chat ${response}`);
-      // console.log(`raider-chat ${typeof response}`);
-
-      // let propertyNames = Object.getOwnPropertyNames(response);
-      // console.log(`raider-chat ${propertyNames}`);
-      // propertyNames.forEach((value) => {
-      // console.log(`raider-chat 3: ${value} ${(response as any)[value]}`);
-      // });
-
-      // for await (const result of response) {
-      // setMessages((messages) => {
-      // let lastMessage = messages.pop() || {
-      // role: "assistant",
-      // content: "",
-      // };
-      // lastMessage.content += result;
-      // return [...messages, lastMessage];
-      // });
-      // }
-
-      // // llm processing thingy, rn not relevant
-      // let output = "I'm a helpful assistant, sorry";
-
-      // addChatBubble(output, "assistant");
     }
   };
 
@@ -209,11 +122,7 @@ export const Chat = () => {
     <ChatContainer>
       <MessagesContainer>
         {messages.map((msg, index) => (
-          <MessageBubble
-            message={msg}
-            key={index}
-            render={!("isHtml" in msg && msg.isHtml)}
-          />
+          <MessageBubble message={msg} key={index} />
         ))}
       </MessagesContainer>
       <ChatField input={input} setInput={setInput} handleSend={handleSend} />
