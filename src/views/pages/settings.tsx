@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {
   Box,
-  Grid,
-  Typography,
   TextField,
   Select,
   MenuItem,
@@ -11,14 +9,10 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  IconButton,
 } from "@mui/material";
-import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
-import { useContext } from "react";
-import { WebviewContext } from "../WebviewContext";
+import TopBar from "../components/TopBar";
 
-export const Settings = () => {
-  const { callApi } = useContext(WebviewContext);
+export default function Settings() {
   const [selectedProvider, setSelectedProvider] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [apiBase, setApiBase] = useState("");
@@ -50,12 +44,7 @@ export const Settings = () => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Grid container alignItems="center">
-        <IconButton onClick={() => callApi("navigateTo", "chat")}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant="h6">Settings</Typography>
-      </Grid>
+      <TopBar title="Settings" />
       <Select
         value={selectedProvider}
         onChange={(e) => setSelectedProvider(e.target.value)}
@@ -178,4 +167,4 @@ export const Settings = () => {
       )}
     </Box>
   );
-};
+}

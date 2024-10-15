@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "./WebviewContext";
-import { Chat } from "./pages/Chat";
-import { History } from "./pages/History";
-import { Settings } from "./pages/settings";
-import { Codebases } from "./pages/Codebases";
-import { Search } from "./pages/Search";
-import { Disconnected } from "./pages/DisconnectWarning";
+
+import Chat from "./pages/Chat";
+import History from "./pages/History";
+import Settings from "./pages/settings";
+import Codebases from "./pages/Codebases";
+import Search from "./pages/Search";
+import DisconnectWarning from "./pages/DisconnectWarning";
 
 type Page =
   | "chat"
@@ -58,7 +59,7 @@ export const Sidebar = () => {
   ) : currentPage == "search" ? (
     <Search />
   ) : currentPage == "disconnected" ? (
-    <Disconnected
+    <DisconnectWarning
       onReconnect={() => {
         callApi("reconnect").then(() => {
           callApi("navigateTo", "chat");

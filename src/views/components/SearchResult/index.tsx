@@ -1,24 +1,16 @@
 import { useContext, useState } from "react";
-import { WebviewContext } from "../WebviewContext";
-import { Box, CardContent, Grow, IconButton, Typography } from "@mui/material";
+import { SearchCodebase } from "src/views/types";
+import { WebviewContext } from "src/views/WebviewContext";
 import {
-  SearchContainer,
-  SearchField,
+  getIcon,
   SearchResultCard,
   SearchResultCardActionArea,
   SearchResultCardMenu,
-  SearchResultContainer,
-  getIcon,
-} from "./Search.styles";
+} from "./styles";
+import { Box, CardContent, Grow, IconButton, Typography } from "@mui/material";
 import { Check, ContentCopy } from "@mui/icons-material";
 
-type Codebase = {
-  type: "github" | "gitlab" | "bitbucket" | "gitee";
-  name: string;
-  url: string;
-};
-
-const SearchResult = ({ result }: { result: Codebase }) => {
+export default function SearchResult({ result }: { result: SearchCodebase }) {
   const { callApi } = useContext(WebviewContext);
 
   const [copied, setCopied] = useState(false);
@@ -67,55 +59,11 @@ const SearchResult = ({ result }: { result: Codebase }) => {
               onClick={handleCopy}
               color={copied ? "success" : "default"}
             >
-              {!copied ? (
-                <Grow in={!copied}>
-                  <ContentCopy />
-                </Grow>
-              ) : (
-                <Grow in={copied}>
-                  <Check />
-                </Grow>
-              )}
+              <Grow in={copied}>{copied ? <Check /> : <ContentCopy />}</Grow>
             </IconButton>
           )}
-          {/* {getIcon() && <IconButton size="small">{getIcon()}</IconButton>} */}
         </SearchResultCardMenu>
       </SearchResultCardActionArea>
     </SearchResultCard>
   );
-};
-
-export const Search = () => {
-  const { callApi } = useContext(WebviewContext);
-
-  const [searchText, setSearchText] = useState("");
-  const [searchResults, setSearchResults] = useState<Codebase[]>([]);
-
-  const [disabled, setDisabled] = useState(false);
-
-  const search = async () => {
-    if (searchText && searchText.length > 0) {
-      setDisabled(true);
-      let results = await callApi("search", searchText);
-      setDisabled(false);
-      console.log(`raider-chat web-raider search results (client): ${results}`);
-      setSearchResults(results);
-    }
-  };
-
-  return (
-    <SearchContainer>
-      <SearchField
-        input={searchText}
-        setInput={setSearchText}
-        handleSearch={search}
-        disabled={disabled}
-      />
-      <SearchResultContainer>
-        {searchResults.map((result, index) => (
-          <SearchResult key={index} result={result} />
-        ))}
-      </SearchResultContainer>
-    </SearchContainer>
-  );
-};
+}

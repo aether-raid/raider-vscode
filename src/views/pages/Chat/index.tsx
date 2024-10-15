@@ -1,16 +1,27 @@
 import { useContext, useEffect, useState } from "react";
-import { WebviewContext } from "../WebviewContext";
-import {
-  ChatContainer,
-  ChatField,
-  MessageBubble,
-  MessagesContainer,
-} from "./Chat.styles";
-import { Message } from "../types";
-import { Fab } from "@mui/material";
+import { WebviewContext } from "../../WebviewContext";
+import { ChatContainer, MessagesContainer } from "./styles";
+import { Message } from "../../types";
 import { RotateLeftOutlined } from "@mui/icons-material";
+import FabBuilder from "../../components/FabBuilder";
+import ChatField from "../../components/ChatField";
+import MessageBubble from "../../components/MessageBubble";
 
-export const Chat = () => {
+export const ChatMessagesContainer = ({
+  messages,
+}: {
+  messages: Message[];
+}) => {
+  return (
+    <MessagesContainer>
+      {messages.map((msg, index) => (
+        <MessageBubble message={msg} key={index} />
+      ))}
+    </MessagesContainer>
+  );
+};
+
+export default function Chat() {
   const { callApi, addListener, removeListener } = useContext(WebviewContext);
 
   const [messages, setMessages] = useState([] as Message[]);
@@ -103,6 +114,11 @@ export const Chat = () => {
     setMessages(messages);
   };
 
+  const reset = () => {
+    callApi("resetMessageHistory");
+    fetchMessages();
+  };
+
   useEffect(() => {
     fetchMessages();
 
@@ -120,24 +136,16 @@ export const Chat = () => {
 
   return (
     <ChatContainer>
-      <MessagesContainer>
-        {messages.map((msg, index) => (
-          <MessageBubble message={msg} key={index} />
-        ))}
-      </MessagesContainer>
+      <ChatMessagesContainer messages={messages} />
+
       <ChatField input={input} setInput={setInput} handleSend={handleSend} />
-      <Fab
-        size="small"
-        sx={{ position: "absolute", top: "16px", right: "16px" }}
-        aria-label="reset"
-        color="primary"
-        onClick={() => {
-          callApi("resetMessageHistory");
-          fetchMessages();
-        }}
-      >
-        <RotateLeftOutlined />
-      </Fab>
+
+      <FabBuilder
+        onClick={reset}
+        label="Reset"
+        orientation="top-right"
+        icon={<RotateLeftOutlined />}
+      />
     </ChatContainer>
   );
-};
+}
