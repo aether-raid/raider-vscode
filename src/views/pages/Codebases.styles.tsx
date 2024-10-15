@@ -1,4 +1,4 @@
-import { Box, Typography, Card, IconButton } from "@mui/material";
+import { Box, Card, IconButton } from "@mui/material";
 import styled from "@emotion/styled";
 
 export const CodebaseContainer = styled(Box)`
@@ -29,13 +29,6 @@ export const CodebaseCard = styled(Card)`
   align-items: start;
 `;
 
-export const CodebaseCardView = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  overflow: hidden;
-`;
-
 export const CodebaseCardMenu = styled(Box)`
   display: flex;
   flex-direction: column;
@@ -58,14 +51,3 @@ export const HoverIconButton = styled(IconButton)`
     color: #aaa;
   }
 `;
-
-export const Fonttype = styled(Typography)`
-  font-size: 15px;
-`;
-
-/**
- * 
- *   &:hover {
-    background-color: #005a9e;
-  }
- */

@@ -11,9 +11,9 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { WebviewContext } from "../WebviewContext";
 import {
+  CodebaseContainer,
   CodebaseCard,
   CodebaseCardMenu,
-  CodebaseContainer,
   DeleteButton,
   HoverIconButton,
 } from "./Codebases.styles";
@@ -24,6 +24,77 @@ import {
   OpenInNew,
   Search,
 } from "@mui/icons-material";
+
+function getProjectName(codebase: string): string {
+  let splits = codebase.split(/\/|\\/g);
+  return splits[splits.length - 1];
+}
+
+function getProjectPath(codebase: string): string {
+  let splits = codebase.split(/\/|\\/g);
+  let path = splits.join("/");
+
+  path = path
+    .replace(/[a-zA-Z]+:\/[uU]sers\/[^/]+\//gi, "~/")
+    .replace(/\/home\/[^/]+\//gi, "~/");
+
+  return path;
+}
+
+export const Codebase = ({
+  codebase,
+  refresh,
+}: {
+  codebase: string;
+  refresh: () => void;
+}) => {
+  let { callApi } = useContext(WebviewContext);
+  return (
+    <CodebaseCard>
+      <CardContent>
+        <Box>
+          <Typography
+            gutterBottom
+            variant="h4"
+            component="div"
+            sx={{ fontSize: "15px" }}
+          >
+            {getProjectName(codebase)}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "grey.500",
+              align: "right",
+              fontFamily: "Consolas",
+            }}
+          >
+            {getProjectPath(codebase)}
+          </Typography>
+        </Box>
+      </CardContent>
+      <CodebaseCardMenu>
+        <HoverIconButton
+          onClick={() => {
+            callApi("openInNewWindow", codebase);
+          }}
+        >
+          <OpenInNew />
+        </HoverIconButton>
+        <DeleteButton
+          onClick={() => {
+            callApi("removeCodebase", codebase).then(() => {
+              refresh();
+            });
+          }}
+          color="error"
+        >
+          <Delete />
+        </DeleteButton>
+      </CodebaseCardMenu>
+    </CodebaseCard>
+  );
+};
 
 export const Codebases = () => {
   let { callApi } = useContext(WebviewContext);
@@ -46,24 +117,6 @@ export const Codebases = () => {
     };
   }, []);
 
-  function getProjectName(codebase: string): string {
-    let splits = codebase.split(/\/|\\/g);
-    return splits[splits.length - 1];
-  }
-
-  function getProjectPath(codebase: string): string {
-    let splits = codebase.split(/\/|\\/g);
-    let path = splits.join("/");
-
-    // path = path.replace(/[a-zA-Z]+:\/Users\/[^/]+/gi, "~/");
-
-    path = path
-      .replace(/[a-zA-Z]+:\/[uU]sers\/[^/]+\//gi, "~/")
-      .replace(/\/home\/[^/]+\//gi, "~/");
-
-    return path;
-  }
-
   return (
     <CodebaseContainer>
       <Grid container alignItems="center">
@@ -76,64 +129,9 @@ export const Codebases = () => {
       </Grid>
       <ul>
         {codebases.map((it) => (
-          <CodebaseCard key={it}>
-            <CardContent>
-              <Box>
-                <Typography
-                  gutterBottom
-                  variant="h4"
-                  component="div"
-                  sx={{ fontSize: "15px" }}
-                >
-                  {getProjectName(it)}
-                  {/* {it} */}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "grey.500",
-                    align: "right",
-                    fontFamily: "Consolas",
-                  }}
-                >
-                  {getProjectPath(it)}
-                </Typography>
-              </Box>
-            </CardContent>
-            <CodebaseCardMenu>
-              <HoverIconButton
-                onClick={() => {
-                  callApi("openInNewWindow", it);
-                }}
-              >
-                <OpenInNew />
-              </HoverIconButton>
-              <DeleteButton
-                onClick={() => {
-                  callApi("removeCodebase", it).then(() => {
-                    fetchCodebases();
-                  });
-                }}
-                color="error"
-              >
-                <Delete />
-              </DeleteButton>
-            </CodebaseCardMenu>
-          </CodebaseCard>
+          <Codebase codebase={it} refresh={fetchCodebases} key={it} />
         ))}
       </ul>
-      {/* <Fab
-        size="medium"
-        sx={{ position: "absolute", bottom: 16, right: 16 }}
-        aria-label="Add"
-        color="primary"
-        onClick={() => {
-          callApi("openAddCodebase");
-          fetchCodebases();
-        }}
-      >
-        <Add />
-      </Fab> */}
       <SpeedDial
         FabProps={{ size: "medium" }}
         ariaLabel="Speed Dial"
