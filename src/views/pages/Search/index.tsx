@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { WebviewContext } from "../../WebviewContext";
 import { SearchContainer, SearchResultContainer } from "./styles";
-import SearchField from "src/views/components/SearchField";
-import SearchResult from "src/views/components/SearchResult";
-import { SearchCodebase } from "src/views/types";
+import SearchField from "../../components/SearchField";
+import SearchResult from "../../components/SearchResult";
+import { SearchCodebase } from "../../types";
 
 export default function Search() {
   const { callApi } = useContext(WebviewContext);

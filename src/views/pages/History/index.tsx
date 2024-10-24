@@ -3,9 +3,9 @@ import { Add } from "@mui/icons-material";
 import { Session } from "../../types";
 import { WebviewContext } from "../../WebviewContext";
 import { SessionContainer } from "./styles";
-import FabBuilder from "src/views/components/FabBuilder";
-import SessionCard from "src/views/components/SessionCard";
-import TopBar from "src/views/components/TopBar";
+import FabBuilder from "../../components/FabBuilder";
+import SessionCard from "../../components/SessionCard";
+import TopBar from "../../components/TopBar";
 
 export default function History() {
   const { callApi } = useContext(WebviewContext);

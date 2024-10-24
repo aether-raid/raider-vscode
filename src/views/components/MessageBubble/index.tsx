@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Message } from "src/views/types";
-import { md } from "src/views/util/markdown";
+import { Message } from "../../types";
+import { md } from "../../util/markdown";
 import { ChatBubbleContainer } from "./styles";
 
 export class MessageBubbleProps {

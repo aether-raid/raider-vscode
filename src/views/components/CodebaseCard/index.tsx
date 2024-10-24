@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { CodebaseCard, CodebaseCardMenu } from "./styles";
-import { WebviewContext } from "src/views/WebviewContext";
+import { WebviewContext } from "../../WebviewContext";
 import { Box, CardContent, Typography } from "@mui/material";
 import { HoverIconButton } from "./styles";
 import { OpenInNew } from "@mui/icons-material";

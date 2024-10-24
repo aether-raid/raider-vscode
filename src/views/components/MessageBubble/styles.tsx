@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { fontArray } from "src/views/theme/theme";
+import { fontArray } from "../../theme/theme";
 
 type ChatBubbleProps = {
   role: string;

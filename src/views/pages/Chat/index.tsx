@@ -107,11 +107,11 @@ export default function Chat() {
   };
 
   const fetchMessages = async () => {
-    setMessages(await callApi("getMessages"));
+    setMessages((await callApi("getMessages")) ?? []);
   };
 
   const getMessagesSent = (messages: Message[]) => {
-    setMessages(messages);
+    setMessages(messages ?? []);
   };
 
   const reset = () => {
@@ -136,7 +136,7 @@ export default function Chat() {
 
   return (
     <ChatContainer>
-      <ChatMessagesContainer messages={messages} />
+      <ChatMessagesContainer messages={messages ?? []} />
 
       <ChatField input={input} setInput={setInput} handleSend={handleSend} />
 

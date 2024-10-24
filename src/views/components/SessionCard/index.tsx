@@ -5,8 +5,8 @@ import {
   SessionCardMenu,
 } from "./styles";
 import { useContext } from "react";
-import { WebviewContext } from "src/views/WebviewContext";
-import { Message, Session } from "src/views/types";
+import { WebviewContext } from "../../WebviewContext";
+import { Message, Session } from "../../types";
 import DeleteButton from "../DeleteButton";
 
 export class SessionCardProps {

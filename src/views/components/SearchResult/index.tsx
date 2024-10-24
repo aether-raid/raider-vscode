@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-import { SearchCodebase } from "src/views/types";
-import { WebviewContext } from "src/views/WebviewContext";
+import { SearchCodebase } from "../../types";
+import { WebviewContext } from "../../WebviewContext";
 import {
   getIcon,
   SearchResultCard,

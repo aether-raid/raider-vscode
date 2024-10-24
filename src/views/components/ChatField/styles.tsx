@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { Box, InputAdornment, OutlinedInput } from "@mui/material";
-import { fontArray } from "src/views/theme/theme";
+import { fontArray } from "../../theme/theme";
 
 export const ChatInputContainer = styled(Box)`
   position: sticky;
