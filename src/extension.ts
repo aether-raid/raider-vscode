@@ -112,6 +112,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     sendMessage: async function (msg: Message) {
       sessionManager.getCurrentSession().message(msg.role, msg.content);
       triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+      await sessionManager.saveToStorage();
       // let output = "Thinking...\n\n";
 
       // // yield output;

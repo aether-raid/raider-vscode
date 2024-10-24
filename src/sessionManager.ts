@@ -150,6 +150,15 @@ export class SessionManager {
     this.jsonPath = path.join(this.storagePath, "sessions.json");
   }
 
+  async saveToStorage(): Promise<boolean> {
+    try {
+      await fs.writeFile(this.jsonPath, JSON.stringify(this.sessions), "utf8");
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async loadFromStorage() {
     let flag = await exists(this.storagePath);
 
@@ -161,8 +170,8 @@ export class SessionManager {
     if (flag2) {
       // file exists
       let data = await fs.readFile(this.jsonPath, "utf8");
-      let sessions = JSON.parse(data) as SessionManagerData;
-      this.sessions = sessions.sessions
+      let sessions = JSON.parse(data);
+      /* this.sessions = sessions.sessions
         .map((it) => new Session(it))
         .reduce(
           (prev, it) => ({
@@ -170,10 +179,11 @@ export class SessionManager {
             [it.id]: it,
           }),
           {} as { [index: string]: Session }
-        );
+        ); */
+      this.sessions = sessions;
       this.currentSession = sessions.currentSession;
-      this.storagePath = sessions.storagePath;
-      this.jsonPath = sessions.jsonPath;
+      this.storagePath = this.storagePath;
+      this.jsonPath = this.jsonPath;
     } else {
       // file does not exist
       await fs.writeFile(
@@ -202,8 +212,9 @@ export class SessionManager {
     messages: Message[];
     lastUpdated: Date;
   }[] {
-    return Object.values(this.sessions)
-      .map((it) => it.export())
+    return (
+      Object.values(this.sessions)
+        /* .map((it) => it.export())
       .filter((it) => it.messages.length > 0 && it.lastUpdated != null)
       .sort((a, b) => {
         if ((a.lastUpdated ?? new Date()) < (b.lastUpdated ?? new Date())) {
@@ -211,12 +222,13 @@ export class SessionManager {
         } else {
           return -1;
         }
-      })
-      .map(({ id, messages, lastUpdated }) => ({
-        id: id,
-        messages: messages,
-        lastUpdated: lastUpdated ?? new Date(),
-      }));
+      }) */
+        .map(({ id, messages, lastUpdated }) => ({
+          id: id,
+          messages: messages,
+          lastUpdated: lastUpdated ?? new Date(),
+        }))
+    );
   }
 
   getCurrentSession(): Session {
