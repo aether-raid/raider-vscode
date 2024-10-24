@@ -107,7 +107,7 @@ export class Session {
     this.messages.push(message);
   }
 
-  export(): SessionData {
+  sessionExport(): SessionData {
     return {
       id: this.id,
       messages: this.messages,
@@ -119,7 +119,7 @@ export class Session {
     try {
       await fs.writeFile(
         this.getFilePath(),
-        JSON.stringify(this.export()),
+        JSON.stringify(this.sessionExport()),
         "utf8"
       );
       this.fileExists = true;
@@ -214,15 +214,15 @@ export class SessionManager {
   }[] {
     return (
       Object.values(this.sessions)
-        /* .map((it) => it.export())
-      .filter((it) => it.messages.length > 0 && it.lastUpdated != null)
-      .sort((a, b) => {
-        if ((a.lastUpdated ?? new Date()) < (b.lastUpdated ?? new Date())) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }) */
+        // .map((it) => it.sessionExport())
+        .filter((it) => it.messages.length > 0 && it.lastUpdated != null)
+        .sort((a, b) => {
+          if ((a.lastUpdated ?? new Date()) < (b.lastUpdated ?? new Date())) {
+            return 1;
+          } else {
+            return -1;
+          }
+        })
         .map(({ id, messages, lastUpdated }) => ({
           id: id,
           messages: messages,
@@ -270,6 +270,7 @@ export class SessionManager {
     if (this.currentSession == sessionId) {
       this.currentSession = null;
     }
+    this.saveToStorage();
   }
 
   isSession(sessionId: string): boolean {
