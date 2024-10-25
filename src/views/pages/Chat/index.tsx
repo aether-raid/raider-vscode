@@ -61,10 +61,16 @@ export default function Chat() {
       addChatBubble("Thinking...", "assistant");
       setInput("");
 
+      clearInterval(interval);
+
       addListener("sendChunk", updateLastMessage);
       let result = await callApi("askRepo", prompt);
       removeListener("sendChunk", updateLastMessage);
       addChatBubble(result, "assistant");
+
+      interval = setInterval(() => {
+        fetchMessages();
+      }, 500);
 
       // let subtasks = (await callApi("generateSubtasks", prompt)).filter(
       //   (it) => it.task_type !== "User action"
@@ -107,12 +113,14 @@ export default function Chat() {
   };
 
   const fetchMessages = async () => {
-    setMessages((await callApi("getMessages")) ?? []);
+    setMessages(await callApi("getMessages"));
   };
 
   const getMessagesSent = (messages: Message[]) => {
-    setMessages(messages ?? []);
+    setMessages(messages);
   };
+
+  let interval: NodeJS.Timeout;
 
   const reset = () => {
     callApi("resetMessageHistory");
@@ -124,7 +132,7 @@ export default function Chat() {
 
     addListener("sendMessages", getMessagesSent);
 
-    let interval = setInterval(() => {
+    interval = setInterval(() => {
       fetchMessages();
     }, 500);
 
@@ -136,7 +144,7 @@ export default function Chat() {
 
   return (
     <ChatContainer>
-      <ChatMessagesContainer messages={messages ?? []} />
+      <ChatMessagesContainer messages={messages} />
 
       <ChatField input={input} setInput={setInput} handleSend={handleSend} />
 

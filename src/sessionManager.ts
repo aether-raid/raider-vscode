@@ -19,7 +19,7 @@ export class SessionNotFoundError extends Error {
 export type SessionData = {
   id: string;
   messages: Message[];
-  lastUpdated: Date | null;
+  lastUpdated: Date | null | string;
 };
 
 export class Session {
@@ -44,6 +44,12 @@ export class Session {
       if (data !== null) {
         this.messages = data.messages;
         this.savedToFile = true;
+        this.lastUpdated =
+          data.lastUpdated instanceof Date
+            ? data.lastUpdated
+            : data.lastUpdated == null
+            ? null
+            : new Date(data.lastUpdated as string);
       }
     });
   }
@@ -148,13 +154,34 @@ export class SessionManager {
   constructor(storagePath: string) {
     this.storagePath = storagePath; //path.join(storagePath, ".raider");
     this.jsonPath = path.join(this.storagePath, "sessions.json");
+    Session.storageDir = this.storagePath;
   }
 
   async saveToStorage(): Promise<boolean> {
     try {
-      await fs.writeFile(this.jsonPath, JSON.stringify(this.sessions), "utf8");
+      let savedSessions = this.getSessions().map((it) => it.id);
+      await fs.writeFile(
+        this.jsonPath,
+        JSON.stringify({
+          sessions: savedSessions,
+          currentSession: this.currentSession,
+          storagePath: this.storagePath,
+          jsonPath: this.jsonPath,
+        } as SessionManagerData),
+        "utf8"
+      );
+
+      for (let key in savedSessions) {
+        console.log(`raider saving session history ${savedSessions[key]} now`);
+        await this.sessions[savedSessions[key]].save();
+      }
       return true;
-    } catch {
+    } catch (e) {
+      console.log(
+        `raider saved session history, error ${
+          typeof e === "string" ? e : e instanceof Error ? e.message : ""
+        }`
+      );
       return false;
     }
   }
@@ -171,19 +198,20 @@ export class SessionManager {
       // file exists
       let data = await fs.readFile(this.jsonPath, "utf8");
       let sessions = JSON.parse(data);
-      /* this.sessions = sessions.sessions
-        .map((it) => new Session(it))
+      this.sessions = (sessions.sessions ?? [])
+        .map((it: any) => new Session(it))
         .reduce(
-          (prev, it) => ({
+          (prev: any, it: any) => ({
             ...prev,
             [it.id]: it,
           }),
           {} as { [index: string]: Session }
-        ); */
-      this.sessions = sessions;
+        );
       this.currentSession = sessions.currentSession;
-      this.storagePath = this.storagePath;
-      this.jsonPath = this.jsonPath;
+      // this.sessions = sessions;
+      // this.currentSession = sessions.currentSession;
+      // this.storagePath = this.storagePath;
+      // this.jsonPath = this.jsonPath;
     } else {
       // file does not exist
       await fs.writeFile(
@@ -193,7 +221,7 @@ export class SessionManager {
           currentSession: null,
           storagePath: this.storagePath,
           jsonPath: this.jsonPath,
-        }),
+        } as SessionManagerData),
         "utf8"
       );
     }
@@ -207,7 +235,7 @@ export class SessionManager {
     return this.getSessionIds().length;
   }
 
-  export(): {
+  getSessions(): {
     id: string;
     messages: Message[];
     lastUpdated: Date;

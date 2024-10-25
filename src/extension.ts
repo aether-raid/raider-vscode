@@ -18,6 +18,9 @@ import { Backend } from "./backendApi";
 import DeferredPromise from "promise-deferred";
 // import { shuffle } from "./util";
 
+let sessionManager: SessionManager | null = null;
+let codebaseManager: CodebaseManager | null = null;
+
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
 
@@ -48,12 +51,9 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       triggerEvent("disconnectServer");
     }
   );
-  const sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
+  sessionManager = new SessionManager(ctx.storageUri?.fsPath || "");
   await sessionManager.loadFromStorage();
-  const codebaseManager = new CodebaseManager(
-    ctx.storageUri?.fsPath || "",
-    backend
-  );
+  codebaseManager = new CodebaseManager(ctx.storageUri?.fsPath || "", backend);
   await codebaseManager.loadFromStorage();
 
   const api: ViewApi = {
@@ -105,14 +105,24 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     // },
 
     updateLastMessage: async function (content: string) {
-      sessionManager.getCurrentSession().updateLastResponse(content);
-      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+      if (sessionManager != null) {
+        sessionManager.getCurrentSession().updateLastResponse(content);
+        triggerEvent(
+          "sendMessages",
+          sessionManager.getCurrentSession().messages
+        );
+      }
     },
 
     sendMessage: async function (msg: Message) {
-      sessionManager.getCurrentSession().message(msg.role, msg.content);
-      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
-      await sessionManager.saveToStorage();
+      if (sessionManager != null) {
+        sessionManager.getCurrentSession().message(msg.role, msg.content);
+        triggerEvent(
+          "sendMessages",
+          sessionManager.getCurrentSession().messages
+        );
+        await sessionManager.saveToStorage();
+      }
       // let output = "Thinking...\n\n";
 
       // // yield output;
@@ -179,33 +189,56 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
       // triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
     },
     getMessages: () => {
-      return sessionManager.getCurrentSession().messages;
+      // console.log(sessionManager.sessions);
+      // console.log(JSON.stringify(sessionManager.sessions));
+      // console.log(sessionManager.getCurrentSession());
+      // console.log(sessionManager.getCurrentSession().messages);
+      // console.log(JSON.stringify(sessionManager.getCurrentSession()));
+      return sessionManager != null
+        ? sessionManager.getCurrentSession().messages
+        : [];
     },
     getSessions: () => {
-      return sessionManager.export();
+      return sessionManager != null ? sessionManager.getSessions() : [];
     },
     resetMessageHistory: () => {
-      sessionManager.getCurrentSession().reset();
-      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+      if (sessionManager != null) {
+        sessionManager.getCurrentSession().reset();
+        triggerEvent(
+          "sendMessages",
+          sessionManager.getCurrentSession().messages
+        );
+      }
     },
     newSession: () => {
       triggerEvent("showPage", "chat");
       currentPage = "chat";
-      sessionManager.openSession();
+      if (sessionManager != null) {
+        sessionManager.openSession();
+      }
     },
     deleteSession: (sessionId: string) => {
-      sessionManager.deleteSession(sessionId);
-      triggerEvent("sendHistory", sessionManager.export());
+      if (sessionManager != null) {
+        sessionManager.deleteSession(sessionId);
+        triggerEvent("sendHistory", sessionManager.getSessions());
+      }
     },
     openSessionChat: async (sessionId: string) => {
-      sessionManager.openSession(sessionId);
-      triggerEvent("showPage", "chat");
-      currentPage = "chat";
-      triggerEvent("sendMessages", sessionManager.getCurrentSession().messages);
+      if (sessionManager != null) {
+        sessionManager.openSession(sessionId);
+        triggerEvent("showPage", "chat");
+        currentPage = "chat";
+        triggerEvent(
+          "sendMessages",
+          sessionManager.getCurrentSession().messages
+        );
+      }
     },
 
     getCodebases: async () => {
-      return await codebaseManager.getAllCodebases();
+      if (codebaseManager != null) {
+        return await codebaseManager.getAllCodebases();
+      } else return [];
     },
 
     openAddCodebase: async () => {
@@ -217,12 +250,15 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
         title: "Select folder",
       });
 
-      if (uris?.length) codebaseManager.add(uris[0].fsPath);
+      if (uris?.length && codebaseManager != null)
+        codebaseManager.add(uris[0].fsPath);
     },
 
     async removeCodebase(uri: string) {
       await backend.disableExternalRepoAgent(uri);
-      codebaseManager.remove(uri);
+      if (codebaseManager != null) {
+        codebaseManager.remove(uri);
+      }
     },
 
     async search(query: string): Promise<SearchResult[]> {
@@ -371,7 +407,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
   vscode.commands.registerCommand("raider.new", () => {
     triggerEvent("showPage", "chat");
     currentPage = "chat";
-    sessionManager.openSession();
+    if (sessionManager != null) sessionManager.openSession();
   });
 
   type Page = "chat" | "history" | "codebases" | "settings" | "search";
@@ -390,5 +426,8 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
 };
 
 export const deactivate = () => {
+  sessionManager?.saveToStorage();
+  // codebaseManager?.saveToStorage();
+
   return;
 };
