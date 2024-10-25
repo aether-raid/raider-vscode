@@ -45,7 +45,7 @@ export const ReconnectButton = (props: { onClick: () => void }) => {
   );
 };
 
-export const DisconnectedContainer = (children: any) => {
+export const DisconnectedContainer = ({ children }: { children: any }) => {
   return (
     <Box
       display="flex"
