@@ -5,3 +5,5 @@ node_modules/**
 
 .aider.tags.cache.v3/
 .aider*
+
+.env
