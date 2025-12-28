@@ -4,7 +4,7 @@ This repository contains the preliminary codebase for the [Raider Chat VS Code E
 
 This system is built on the tremendous boilerplate assembled in [`sfc-gh-tkojima/vscode-react-webviews`](https://github.com/sfc-gh-tkojima/vscode-react-webviews) to run React on VS Code Web Views.
 
-It interfaces directly with the [`sikfeng/raider-backend`](https://github.com/sikfeng/raider-backend) backend and [`ThePyProgrammer/web-raider`](https://github.com/ThePyProgrammer/web-raider) package.
+It interfaces directly with the [`aether-raid/raider-backend`](https://github.com/aether-raid/raider-backend) backend and [`aether-raid/web-raider`](https://github.com/aether-raid/web-raider) package.
 
 ## Overview of Extension
 
